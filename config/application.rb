@@ -45,5 +45,14 @@ module Fill
 
     # Enable the asset pipeline
     config.assets.enabled = true
+
+    # Custom generators
+    config.generators do |g|
+      g.template_engine(:haml)
+      g.test_framework(:rspec, :fixture => true,
+                               :views   => false,
+                               :routing => false)
+      g.fixture_replacement(:factory_girl, :dir => 'spec/factories')
+    end
   end
 end
