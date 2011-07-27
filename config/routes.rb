@@ -1,4 +1,6 @@
 Fill::Application.routes.draw do
+  devise_for :admins
+
   resources :items
 
   root :to => 'pages#index'
