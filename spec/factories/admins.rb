@@ -1,6 +1,9 @@
-# Read about factories at http://github.com/thoughtbot/factory_girl
+Factory.sequence :email do |n|
+  "email#{n}@example.com"
+end
 
-FactoryGirl.define do
-  factory :admin do
-    end
+Factory.define :admin do |admin|
+  admin.email { Factory.next(:email) }
+  admin.password "foobar"
+  admin.password_confirmation "foobar"
 end
