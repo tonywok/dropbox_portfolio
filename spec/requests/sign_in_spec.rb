@@ -13,21 +13,35 @@ describe "Sign in as admin" do
     context "valid admin account" do
       let(:admin) { Factory(:admin) }
 
-      it "signs in the admin" do
+      before do
         fill_in "admin_email", :with => admin.email
         fill_in "admin_password", :with => admin.password
         click_button "Sign in"
+      end
+
+      it "signs in the admin" do
         within "p.notice" do
           page.should have_content("Signed in successfully.")
         end
       end
+
+      it "takes me to admin dashboard page" do
+        page.current_path.should == admin_items_path
+      end
     end
 
     context "invalid admin account" do
-      it "does not sign in the admin" do
+      before do
         fill_in "admin_email", :with => "jerk@face.com"
         fill_in "admin_password", :with => "balls"
         click_button "Sign in"
+      end
+
+      it 'redirects back to admins/sign_in' do
+        page.current_path.should == new_admin_session_path
+      end
+
+      it "does not sign in the admin" do
         within "p.alert" do
           page.should have_content("Invalid email or password.")
         end

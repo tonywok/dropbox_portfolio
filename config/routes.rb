@@ -3,6 +3,10 @@ Fill::Application.routes.draw do
 
   resources :items
 
+  namespace :admin do
+    resources :items, :only => [:index]
+  end
+
   root :to => 'pages#index'
 
   # The priority is based upon order of creation:
