@@ -1,10 +1,15 @@
 Fill::Application.routes.draw do
   devise_for :admins
 
-  resources :items
+  resources :items, :only => [:show, :index]
 
   namespace :admin do
-    resources :items, :only => [:index]
+    resources :items, :only => [:update, :edit, :destroy, :index]
+    resources :dropboxes, :only => [:new, :create] do
+      collection do
+        get 'authorize'
+      end
+    end
   end
 
   root :to => 'pages#index'

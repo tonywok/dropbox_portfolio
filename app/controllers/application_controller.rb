@@ -4,6 +4,6 @@ class ApplicationController < ActionController::Base
   private
 
   def after_sign_in_path_for(admin)
-    admin_items_path
+    items_path
   end
 end
