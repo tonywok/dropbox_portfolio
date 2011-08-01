@@ -5,6 +5,7 @@ gem 'jquery-rails'
 gem 'haml'
 gem 'devise'
 gem 'dropbox'
+gem 'carrierwave'
 
 group :assets do
   gem 'sass-rails', "~> 3.1.0.rc"

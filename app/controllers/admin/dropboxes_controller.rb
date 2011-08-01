@@ -2,13 +2,16 @@ require 'ostruct'
 class Admin::DropboxesController < ApplicationController
   before_filter :authenticate_admin!
 
-  def new; end
+  def new
+  end
 
   def create
     directory = get_dropbox_session.list(params[:folder_name], :mode => :dropbox)
-    @imgs = directory.map { |i| i.path }
-    render 'new'
+    raise directory.inspect
   end
+  #   @imgs = directory.map { |i| i.path }
+  #   render 'new'
+  # end
 
   def authorize
     if params[:oauth_token]
