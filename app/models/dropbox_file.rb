@@ -1,18 +1,16 @@
 class DropboxFile < ActiveRecord::Base
   belongs_to :item
-# 
-#   mount_uploader :attachment, AttachmentUploader
+
+  mount_uploader :attachment, AttachmentUploader
 
   validates :path, :presence => true, :uniqueness => true
   validates :revision, :presence => true
   validates :attachment, :presence => true
 
-  def refresh(new_revision)
-    if revision == new_revision
-      download
+  def replace(dropbox_session)
+    file_content = dropbox_session.download(path)
+    File.open(attachment.path, 'w') do |f|
+      f.write(file_content)
     end
-  end
-
-  def download
   end
 end

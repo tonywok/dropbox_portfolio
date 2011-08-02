@@ -28,10 +28,8 @@ describe "DropboxSync" do
   end
 
   describe "#prune_items" do
-    before do
-      @expired_item = Factory(:item, :filename_identifier => 'not-in-meta', :section => section)
-      @current_item = Factory(:item, :filename_identifier => 'bar', :section => section)
-    end
+    let!(:expired_item) { Factory(:item, :filename_identifier => 'not-in-meta', :section => section) }
+    let!(:current_item) { Factory(:item, :filename_identifier => 'bar', :section => section) }
 
     let(:section) { 'section_1' }
 
@@ -47,20 +45,18 @@ describe "DropboxSync" do
 
     it 'destroys items not included in parsed meta list' do
       dropbox.prune_items
-      Item.find_by_id(@expired_item).should be_nil
+      Item.find_by_id(expired_item).should be_nil
     end
 
     it 'does not destroy items that match new dropbox metadata' do
       dropbox.prune_items
-      Item.find(@current_item).should_not be_nil
+      Item.find(current_item).should_not be_nil
     end
   end
 
   describe "#prune_dropbox_files" do
-    before do
-      @expired_file = Factory(:dropbox_file, :path => "/section_1/bar_the-very-hungry-caterpillar.png")
-      @current_file = Factory(:dropbox_file, :path => "/section_1/bar_the-very-outofdate-facemonster.png")
-    end
+    let!(:expired_file) { Factory(:dropbox_file, :path => "/section_1/bar_the-very-hungry-caterpillar.png") }
+    let!(:current_file) { Factory(:dropbox_file, :path => "/section_1/bar_the-very-outofdate-facemonster.png") }
 
     let(:section) { 'section_1' }
 
@@ -76,19 +72,20 @@ describe "DropboxSync" do
 
     it 'destroys files not included in parsed meta list' do
       dropbox.prune_dropbox_files
-      DropboxFile.find_by_id(@expired_file).should be_nil
+      DropboxFile.find_by_id(expired_file).should be_nil
     end
 
     it 'does not destroy files that match new dropobox metadata' do
       dropbox.prune_dropbox_files
-      DropboxFile.find(@current_file).should_not be_nil
+      DropboxFile.find(current_file).should_not be_nil
     end
   end
 
   describe "#prune" do
-    before do
-      @expired_item_with_file = Factory(:item, :filename_identifier => 'not-in-meta', :section => section)
-      @expired_item_with_file.dropbox_files << Factory(:dropbox_file)
+    let!(:expired_item_with_file) do
+      item = Factory(:item, :filename_identifier => 'not-in-meta', :section => section)
+      item.dropbox_files << Factory(:dropbox_file)
+      item
     end
 
     let(:section) { 'section_1' }
@@ -106,10 +103,70 @@ describe "DropboxSync" do
     context "when an expired item has dropbox files" do
       it "prunes out of date items along with all of it's files" do
         dropbox.prune
-        dropbox_file = @expired_item_with_file.dropbox_files.first
-        Item.find_by_id(@expired_item_with_file).should be_nil
+        dropbox_file = expired_item_with_file.dropbox_files.first
+        Item.find_by_id(expired_item_with_file).should be_nil
         DropboxFile.find_by_id(dropbox_file).should be_nil
       end
+    end
+  end
+
+  describe "#parse_item" do
+    let(:section) { 'section_1' }
+
+    let(:meta) do
+      [
+        OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+      ]
+    end
+
+    let(:session) { mock('session', :ls => meta) }
+    let(:dropbox) { DropboxSync.new(session, section) }
+
+    it "pulls the item out of the item name" do
+      filename = "/foo/bar/stuff/my-item_my-name.png"
+      dropbox.parse_item(filename).should == :'my-item'
+    end
+
+    it "pulls the item out of the item name" do
+      filename = "/foo/bar/stuff/my-item.png"
+      dropbox.parse_item(filename).should == :'my-item'
+    end
+  end
+
+  describe "#refresh" do
+    let(:section) { 'section_1' }
+    let(:revision) { '1041066003' }
+
+    let(:meta) do
+      [
+        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+      ]
+    end
+
+    let!(:unrevised_item) { Factory(:item) }
+    let(:session) { mock('session', :ls => meta, :download => 'content') }
+    let(:dropbox) { DropboxSync.new(session, section) }
+
+    context "same revision" do
+      let!(:dropbox_file) { Factory(:dropbox_file, :revision => revision) }
+
+      it "takes no action" do
+        session.should_not_receive(:download)
+        dropbox.refresh
+      end
+    end
+
+    context "different revision" do
+      let!(:dropbox_file) { Factory(:dropbox_file, :revision => "#{session}x") }
+
+      it "replaces the file" do
+        session.should_receive(:download).with(dropbox_file.path)
+        dropbox.refresh
+      end
+    end
+
+    context "new files" do
+      it "ignores them"
     end
   end
 end

@@ -10,7 +10,7 @@ class DropboxSync
 
   def sync
     prune
-    # refresh_existing
+    refresh
     # download_new
   end
 
@@ -28,6 +28,11 @@ class DropboxSync
     end
   end
 
+  def refresh
+    files = DropboxFile.where("revision NOT IN (?)", @meta.collect(&:revision))
+    files.each { |f| f.replace(session) }
+  end
+
   def prune_items
     Item.where("section = ? AND filename_identifier NOT IN (?)", section, parsed_meta.keys).destroy_all
   end
@@ -37,6 +42,6 @@ class DropboxSync
   end
 
   def parse_item(filename)
-    filename.sub(%r(.*/), '').split('_').first.to_sym
+    filename.match(%r(.*/([^_.]*))).captures.first.to_sym
   end
 end
