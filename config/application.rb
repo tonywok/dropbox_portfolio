@@ -13,6 +13,8 @@ require "active_resource/railtie"
 # or test environments.
 Bundler.require *Rails.groups(:assets) if defined?(Bundler)
 
+StringIO.class_eval { def original_filename; "stringiohaxx.png"; end }
+
 module Fill
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
