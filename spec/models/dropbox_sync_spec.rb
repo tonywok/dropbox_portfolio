@@ -136,10 +136,12 @@ describe "DropboxSync" do
   describe "#refresh" do
     let(:section) { 'section_1' }
     let(:revision) { '1041066003' }
+    let(:filename_identifier) { "book-covers" }
+    let(:dropbox_filepath) { "#{section}/#{filename_identifier}_the-very-hungry-catapillar.png" }
 
     let(:meta) do
       [
-        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "#{dropbox_filepath}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
       ]
     end
 
@@ -148,25 +150,74 @@ describe "DropboxSync" do
     let(:dropbox) { DropboxSync.new(session, section) }
 
     context "same revision" do
-      let!(:dropbox_file) { Factory(:dropbox_file, :revision => revision) }
+      let!(:dropbox_file) do
+        Factory(:dropbox_file,
+                :revision => revision,
+                :path => dropbox_filepath,
+                :item => Factory(:item, :filename_identifier => filename_identifier))
+      end
+
+      it "has file in parsed meta collection" do
+        dropbox.parsed_meta[filename_identifier.to_sym].should include dropbox_file.path
+      end
 
       it "takes no action" do
         session.should_not_receive(:download)
         dropbox.refresh
       end
+
+      it "removes up to date file from parsed meta collection" do 
+        dropbox.refresh
+        files_by_item = dropbox.parsed_meta[filename_identifier.to_sym]
+        files_by_item.should_not include dropbox_file.path
+      end
     end
 
     context "different revision" do
-      let!(:dropbox_file) { Factory(:dropbox_file, :revision => "#{session}x") }
+      let!(:dropbox_file) do
+        Factory(:dropbox_file,
+                :revision => "!!#{revision}!!",
+                :path => dropbox_filepath,
+                :item => Factory(:item, :filename_identifier => filename_identifier))
+      end
 
       it "replaces the file" do
         session.should_receive(:download).with(dropbox_file.path)
         dropbox.refresh
       end
+
+      it "removes revised file from parsed meta collection" do 
+        dropbox.refresh
+        files_by_item = dropbox.parsed_meta[filename_identifier.to_sym]
+        files_by_item.should_not include dropbox_file.path
+      end
+    end
+  end
+
+  describe "#download_new" do
+    let(:section) { 'section_1' }
+    let(:revision) { '1041066003' }
+
+    let(:meta) do
+      [
+        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/album-art_fill-and-the-wailers.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+      ]
     end
 
-    context "new files" do
-      it "ignores them"
+    let!(:existing_item) { Factory(:item, :filename_identifier => 'book_labels') }
+
+    let(:session) { mock('session', :ls => meta, :download => 'content') }
+    let(:dropbox) { DropboxSync.new(session, section) }
+
+    context "the file belongs to an existing item" do
+      it "attaches the file to the item"
+    end
+
+    context "the file belongs to a new item" do
+      it "creates the new item"
+
+      it "attaches the file to the new item"
     end
   end
 end

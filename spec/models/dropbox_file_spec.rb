@@ -1,6 +1,15 @@
 require 'spec_helper'
 
 describe DropboxFile do
+  describe "validations" do
+    let(:dropbox_file) { DropboxFile.new }
+
+    it "must belong to an item" do
+      dropbox_file.valid?
+      dropbox_file.errors.messages[:item].should include "can't be blank"
+    end
+  end
+
   describe "#replace" do
     let(:item) { Factory.create(:item) }
     let(:file) { Factory.create(:dropbox_file, :item => item) }

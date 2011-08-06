@@ -6,6 +6,7 @@ class DropboxFile < ActiveRecord::Base
   validates :path, :presence => true, :uniqueness => true
   validates :revision, :presence => true
   validates :attachment, :presence => true
+  validates :item, :presence => true
 
   def replace(dropbox_session)
     file_content = dropbox_session.download(path)
