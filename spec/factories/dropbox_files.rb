@@ -1,6 +1,6 @@
 FactoryGirl.define do
   sequence :path do |n|
-    "/path_#{n}"
+    "/somepath_#{n}"
   end
 
   sequence :revision do |n|

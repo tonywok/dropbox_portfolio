@@ -3,12 +3,15 @@ require 'spec_helper'
 describe "DropboxSync" do
   describe '#parse' do
     let(:section) { 'section_1' }
+    let(:revision_1) { '1' }
+    let(:revision_2) { '2' }
+    let(:revision_3) { '3' }
 
     let(:meta) do
       [
-        OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
-        OpenStruct.new(:revision => '1041066005', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_see-spot-run.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
-        OpenStruct.new(:revision => '1041065999', :thumb_exists => true, :bytes => 76278, :modified => '2011-07-30 19:47:32 -0400', :path => "/section_1/beer-labels_natural-light.jpeg", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/jpeg", :size => "74.5KB", :directory? => false),
+        OpenStruct.new(:revision => revision_1, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+        OpenStruct.new(:revision => revision_2, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_see-spot-run.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+        OpenStruct.new(:revision => revision_3, :thumb_exists => true, :bytes => 76278, :modified => '2011-07-30 19:47:32 -0400', :path => "/section_1/beer-labels_natural-light.jpeg", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/jpeg", :size => "74.5KB", :directory? => false),
       ]
     end
 
@@ -20,10 +23,22 @@ describe "DropboxSync" do
       dropbox.parse.keys.should include :'beer-labels'
     end
 
-    it 'has has files associated to item keys' do
-      dropbox.parse[:'book-covers'].should include '/section_1/book-covers_see-spot-run.png'
-      dropbox.parse[:'book-covers'].should include '/section_1/book-covers_the-very-hungry-caterpillar.png'
-      dropbox.parse[:'beer-labels'].should include '/section_1/beer-labels_natural-light.jpeg'
+    it 'has has file paths associated to item keys' do
+      book_cover_paths = dropbox.parse[:'book-covers'].collect { |file| file[:path] }
+      beer_labels_paths = dropbox.parse[:'beer-labels'].collect { |file| file[:path] }
+
+      book_cover_paths.should include '/section_1/book-covers_see-spot-run.png'
+      book_cover_paths.should include '/section_1/book-covers_the-very-hungry-caterpillar.png'
+      beer_labels_paths.should include '/section_1/beer-labels_natural-light.jpeg'
+    end
+
+    it 'has has file revisions associated to item keys' do
+      book_cover_revisions = dropbox.parse[:'book-covers'].collect { |file| file[:revision] }
+      beer_labels_revisions = dropbox.parse[:'beer-labels'].collect { |file| file[:revision] }
+
+      book_cover_revisions.should include revision_1
+      book_cover_revisions.should include revision_2
+      beer_labels_revisions.should include revision_3
     end
   end
 
@@ -158,7 +173,8 @@ describe "DropboxSync" do
       end
 
       it "has file in parsed meta collection" do
-        dropbox.parsed_meta[filename_identifier.to_sym].should include dropbox_file.path
+        files_for_item = dropbox.parsed_meta[filename_identifier.to_sym]
+        files_for_item.map {|file| file[:path] }.should include dropbox_file.path
       end
 
       it "takes no action" do
@@ -197,27 +213,41 @@ describe "DropboxSync" do
   describe "#download_new" do
     let(:section) { 'section_1' }
     let(:revision) { '1041066003' }
+    let(:filename_identifier) { "book-covers" }
+    let(:filename) { "the-very-hungry-catapillar.png" }
+    let(:dropbox_filepath) { "#{section}/#{filename_identifier}_#{filename}" }
 
     let(:meta) do
       [
-        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/book-covers_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
-        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/album-art_fill-and-the-wailers.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+        OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "#{dropbox_filepath}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
       ]
     end
 
-    let!(:existing_item) { Factory(:item, :filename_identifier => 'book_labels') }
-
-    let(:session) { mock('session', :ls => meta, :download => 'content') }
+    let(:session) { mock('session', :ls => meta, :download => StringIO.open('spec/fixtures/random.png')) }
     let(:dropbox) { DropboxSync.new(session, section) }
 
     context "the file belongs to an existing item" do
-      it "attaches the file to the item"
+      let!(:existing_item) do
+        Factory(:item, :filename_identifier => filename_identifier)
+      end
+
+      it "attaches the file to the item" do
+        dropbox.download_new
+        item_file_paths = existing_item.dropbox_files.map(&:path)
+        item_file_paths.should include dropbox_filepath
+      end
+
+      it "creates a file on the file system" do
+        dropbox.download_new
+        File.exists? AttachmentUploader.store_dir + filename
+      end
     end
 
     context "the file belongs to a new item" do
       it "creates the new item"
 
       it "attaches the file to the new item"
+      it "creates a file on the file system"
     end
   end
 end

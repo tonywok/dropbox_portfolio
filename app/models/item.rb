@@ -3,5 +3,5 @@ class Item < ActiveRecord::Base
 
   validates :title, :presence => true
   validates :section, :presence => true
-  validates :filename_identifier, :presence => true
+  validates :filename_identifier, :presence => true,
 end

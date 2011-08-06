@@ -12,7 +12,8 @@ class DropboxSync
     meta.inject({}) do |files_by_item, file|
       item = parse_item(file.path)
       files_by_item[item] ||= []
-      files_by_item[item] << file.path
+      files_by_item[item] << { :path     => file.path,
+                               :revision => file.revision }
       files_by_item
     end
   end
@@ -34,11 +35,10 @@ class DropboxSync
   end
 
   def prune_dropbox_files
-    DropboxFile.where("path IN (?)", parsed_meta.values.flatten).destroy_all
+    DropboxFile.where("path IN (?)", meta_paths).destroy_all
   end
 
   def refresh
-    meta_revisions   = @meta.collect(&:revision)
     revised_files    = DropboxFile.includes(:item).where("revision NOT IN (?)", meta_revisions)
     up_to_date_files = DropboxFile.includes(:item).where("revision IN (?)", meta_revisions)
 
@@ -53,10 +53,28 @@ class DropboxSync
   end
 
   def download_new
+    parsed_meta.each_pair do |item_identifier, files|
+      item = Item.find_by_filename_identifier(item_identifier)
+      files.each do |file|
+        db_file = item.dropbox_files.new(:path => file[:path],
+                                         :revision => file[:revision])
+        db_file.download(session)
+      end
+    end
   end
 
   def parse_item(filename)
     filename.match(%r(.*/([^_.]*))).captures.first.to_sym
+  end
+
+  private
+
+  def meta_paths
+    @meta_paths ||= parsed_meta.values.flatten.map {|hash| hash[:path] }
+  end
+
+  def meta_revisions
+    @meta_revisions ||= parsed_meta.values.flatten.map {|hash| hash[:revision] }
   end
 
 end
