@@ -1,19 +1,16 @@
 require File.expand_path('../boot', __FILE__)
 
 # Pick the frameworks you want:
- require "active_record/railtie"
+require "active_record/railtie"
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "active_resource/railtie"
- require "sprockets/railtie"
-# require "rails/test_unit/railtie"
+require "sprockets/railtie"
 
 # If you have a Gemfile, require the default gems, the ones in the
 # current environment and also include :assets gems if in development
 # or test environments.
 Bundler.require *Rails.groups(:assets) if defined?(Bundler)
-
-StringIO.class_eval { def original_filename; "stringiohaxx.png"; end }
 
 module Fill
   class Application < Rails::Application
