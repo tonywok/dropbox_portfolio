@@ -41,9 +41,10 @@ ActiveRecord::Schema.define(:version => 20110731222506) do
 
   create_table "items", :force => true do |t|
     t.string   "title"
-    t.string   "section",             :default => "misc"
+    t.string   "section",     :default => "misc"
     t.text     "description"
-    t.string   "filename_identifier"
+    t.string   "key"
+    t.string   "identifier"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

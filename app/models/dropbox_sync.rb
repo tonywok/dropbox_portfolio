@@ -9,7 +9,7 @@ class DropboxSync
   end
 
   def parse
-    meta.inject({}) do |files_by_item, file|
+    meta.inject(HashWithIndifferentAccess.new) do |files_by_item, file|
       item = parse_item(file.path)
       files_by_item[item] ||= []
       files_by_item[item] << { :path     => file.path,
@@ -30,33 +30,32 @@ class DropboxSync
   end
 
   def prune_items
-    outdated_items = Item.where("section = ? AND filename_identifier NOT IN (?)", section, parsed_meta.keys)
-    outdated_items.destroy_all
+    Item.where("section = ? AND identifier NOT IN (?)", section, parsed_meta.keys).destroy_all
   end
 
   def prune_dropbox_files
-    DropboxFile.where("path IN (?)", meta_paths).destroy_all
+    DropboxFile.includes(:item).where("items.section = ? AND path NOT IN (?)", section, meta_paths).destroy_all
   end
 
   def refresh
-    revised_files    = DropboxFile.includes(:item).where("revision NOT IN (?)", meta_revisions)
-    up_to_date_files = DropboxFile.includes(:item).where("revision IN (?)", meta_revisions)
+    revised_files    = DropboxFile.includes(:item).where("items.section = ? and revision NOT IN (?)", section, meta_revisions)
+    up_to_date_files = DropboxFile.includes(:item).where("items.section = ? and revision IN (?)", section, meta_revisions)
 
     up_to_date_files.each do |file|
-      parsed_meta[file.item.filename_identifier.to_sym].delete(file.path)
+      delete_meta_file(file)
     end
 
     revised_files.each do |file|
-      parsed_meta[file.item.filename_identifier.to_sym].delete(file.path)
+      delete_meta_file(file)
       file.replace(session)
     end
   end
 
   def download_new
     parsed_meta.each_pair do |item_identifier, files|
-      item = Item.find_by_filename_identifier(item_identifier)
+      item = Item.find_by_identifier(item_identifier)
       files.each do |file|
-        db_file = item.dropbox_files.new(:path => file[:path],
+        db_file = item.dropbox_files.new(:path     => file[:path],
                                          :revision => file[:revision])
         db_file.download(session)
       end
@@ -70,11 +69,16 @@ class DropboxSync
   private
 
   def meta_paths
-    @meta_paths ||= parsed_meta.values.flatten.map {|hash| hash[:path] }
+    parsed_meta.values.flatten.map { |hash| hash[:path] }
   end
 
   def meta_revisions
-    @meta_revisions ||= parsed_meta.values.flatten.map {|hash| hash[:revision] }
+    parsed_meta.values.flatten.map { |hash| hash[:revision] }
   end
 
+  def delete_meta_file(file)
+    parsed_meta[file.item.identifier].delete_if do |file_hash|
+      (file_hash[:path] == file.path) && (file_hash[:revision] == file.revision)
+    end
+  end
 end

@@ -4,7 +4,8 @@ class CreateItems < ActiveRecord::Migration
       t.string :title
       t.string :section, :default => 'misc'
       t.text :description
-      t.string :filename_identifier
+      t.string :key
+      t.string :identifier
 
       t.timestamps
     end

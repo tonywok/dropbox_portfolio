@@ -19,8 +19,8 @@ describe "DropboxSync" do
     let(:dropbox) { DropboxSync.new(session, section) }
 
     it 'returns hash with item keys' do
-      dropbox.parse.keys.should include :'book-covers'
-      dropbox.parse.keys.should include :'beer-labels'
+      dropbox.parse.keys.should include 'book-covers'
+      dropbox.parse.keys.should include 'beer-labels'
     end
 
     it 'has has file paths associated to item keys' do
@@ -43,8 +43,8 @@ describe "DropboxSync" do
   end
 
   describe "#prune_items" do
-    let!(:expired_item) { Factory(:item, :filename_identifier => 'not-in-meta', :section => section) }
-    let!(:current_item) { Factory(:item, :filename_identifier => 'bar', :section => section) }
+    let!(:expired_item) { Factory(:item, :identifier => 'not-in-meta', :section => section) }
+    let!(:current_item) { Factory(:item, :identifier => 'bar', :section => section) }
 
     let(:section) { 'section_1' }
 
@@ -70,24 +70,31 @@ describe "DropboxSync" do
   end
 
   describe "#prune_dropbox_files" do
-    let!(:expired_file) { Factory(:dropbox_file, :path => "/section_1/bar_the-very-hungry-caterpillar.png") }
-    let!(:current_file) { Factory(:dropbox_file, :path => "/section_1/bar_the-very-outofdate-facemonster.png") }
-
     let(:section) { 'section_1' }
+
+    let!(:deleted_file) do
+      Factory(:dropbox_file, :path => "/#{section}/bar_the-very-hungry-caterpillar.png",
+                             :item => Factory(:item, :section => section))
+    end
+
+    let!(:current_file) do
+      Factory(:dropbox_file, :path => "/#{section}/bar_the-very-outofdate-facemonster.png",
+                             :item => Factory(:item, :section => section))
+    end
 
     let(:meta) do
       [
-        OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/bar_the-very-hungry-caterpillar.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
-        OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/section_1/foo_the-very-hungry-facemonster.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+        OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/#{section}/bar_foo.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+        OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/#{section}/bar_the-very-outofdate-facemonster.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
       ]
     end
 
     let(:session) { mock('session', :ls => meta) }
     let(:dropbox) { DropboxSync.new(session, section) }
 
-    it 'destroys files not included in parsed meta list' do
+    it 'destroys files belonging to the relevant section not included in parsed meta list' do
       dropbox.prune_dropbox_files
-      DropboxFile.find_by_id(expired_file).should be_nil
+      DropboxFile.find_by_id(deleted_file).should be_nil
     end
 
     it 'does not destroy files that match new dropobox metadata' do
@@ -98,7 +105,7 @@ describe "DropboxSync" do
 
   describe "#prune" do
     let!(:expired_item_with_file) do
-      item = Factory(:item, :filename_identifier => 'not-in-meta', :section => section)
+      item = Factory(:item, :identifier => 'not-in-meta', :section => section)
       item.dropbox_files << Factory(:dropbox_file)
       item
     end
@@ -151,8 +158,8 @@ describe "DropboxSync" do
   describe "#refresh" do
     let(:section) { 'section_1' }
     let(:revision) { '1041066003' }
-    let(:filename_identifier) { "book-covers" }
-    let(:dropbox_filepath) { "#{section}/#{filename_identifier}_the-very-hungry-catapillar.png" }
+    let(:identifier) { "book-covers" }
+    let(:dropbox_filepath) { "/#{section}/#{identifier}_the-very-hungry-catapillar.png" }
 
     let(:meta) do
       [
@@ -160,7 +167,6 @@ describe "DropboxSync" do
       ]
     end
 
-    let!(:unrevised_item) { Factory(:item) }
     let(:session) { mock('session', :ls => meta, :download => 'content') }
     let(:dropbox) { DropboxSync.new(session, section) }
 
@@ -169,11 +175,11 @@ describe "DropboxSync" do
         Factory(:dropbox_file,
                 :revision => revision,
                 :path => dropbox_filepath,
-                :item => Factory(:item, :filename_identifier => filename_identifier))
+                :item => Factory(:item, :identifier => identifier))
       end
 
       it "has file in parsed meta collection" do
-        files_for_item = dropbox.parsed_meta[filename_identifier.to_sym]
+        files_for_item = dropbox.parsed_meta[identifier]
         files_for_item.map {|file| file[:path] }.should include dropbox_file.path
       end
 
@@ -182,9 +188,9 @@ describe "DropboxSync" do
         dropbox.refresh
       end
 
-      it "removes up to date file from parsed meta collection" do 
+      it "removes up to date file from parsed meta collection" do
         dropbox.refresh
-        files_by_item = dropbox.parsed_meta[filename_identifier.to_sym]
+        files_by_item = dropbox.parsed_meta[identifier]
         files_by_item.should_not include dropbox_file.path
       end
     end
@@ -194,7 +200,7 @@ describe "DropboxSync" do
         Factory(:dropbox_file,
                 :revision => "!!#{revision}!!",
                 :path => dropbox_filepath,
-                :item => Factory(:item, :filename_identifier => filename_identifier))
+                :item => Factory(:item, :section => section, :identifier => identifier))
       end
 
       it "replaces the file" do
@@ -202,9 +208,9 @@ describe "DropboxSync" do
         dropbox.refresh
       end
 
-      it "removes revised file from parsed meta collection" do 
+      it "removes revised file from parsed meta collection" do
         dropbox.refresh
-        files_by_item = dropbox.parsed_meta[filename_identifier.to_sym]
+        files_by_item = dropbox.parsed_meta[identifier]
         files_by_item.should_not include dropbox_file.path
       end
     end
@@ -213,9 +219,9 @@ describe "DropboxSync" do
   describe "#download_new" do
     let(:section) { 'section_1' }
     let(:revision) { '1041066003' }
-    let(:filename_identifier) { "book-covers" }
+    let(:identifier) { "book-covers" }
     let(:filename) { "the-very-hungry-catapillar.png" }
-    let(:dropbox_filepath) { "#{section}/#{filename_identifier}_#{filename}" }
+    let(:dropbox_filepath) { "#{section}/#{identifier}_#{filename}" }
 
     let(:meta) do
       [
@@ -228,7 +234,7 @@ describe "DropboxSync" do
 
     context "the file belongs to an existing item" do
       let!(:existing_item) do
-        Factory(:item, :filename_identifier => filename_identifier)
+        Factory(:item, :identifier => identifier)
       end
 
       it "attaches the file to the item" do
