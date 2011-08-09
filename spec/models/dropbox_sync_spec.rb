@@ -245,15 +245,26 @@ describe "DropboxSync" do
 
       it "creates a file on the file system" do
         dropbox.download_new
-        File.exists? AttachmentUploader.store_dir + filename
+        File.exists?("#{existing_item.dropbox_files.first.attachment}")
       end
     end
 
     context "the file belongs to a new item" do
-      it "creates the new item"
+      it "creates the new item" do
+        dropbox.download_new
+        Item.find_by_identifier(identifier).should_not be_nil
+      end
 
-      it "attaches the file to the new item"
-      it "creates a file on the file system"
+      it "attaches the file to the new item" do
+        dropbox.download_new
+        Item.find_by_identifier(identifier).dropbox_files.collect(&:path).should include dropbox_filepath
+      end
+
+      it "creates a file on the file system" do
+        dropbox.download_new
+        new_item = Item.find_by_identifier(identifier)
+        File.exists?("#{new_item.dropbox_files.first.attachment}")
+      end
     end
   end
 end

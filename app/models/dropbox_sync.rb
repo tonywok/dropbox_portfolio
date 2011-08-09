@@ -53,10 +53,10 @@ class DropboxSync
 
   def download_new
     parsed_meta.each_pair do |item_identifier, files|
-      item = Item.find_by_identifier(item_identifier)
+      item = Item.find_or_create_by_identifier(:identifier => item_identifier,
+                                               :section    => section)
       files.each do |file|
-        db_file = item.dropbox_files.new(:path     => file[:path],
-                                         :revision => file[:revision])
+        db_file = item.dropbox_files.new(:path => file[:path], :revision => file[:revision])
         db_file.download(session)
       end
     end

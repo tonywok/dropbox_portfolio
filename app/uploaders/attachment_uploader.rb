@@ -13,7 +13,7 @@ class AttachmentUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
-    path = "portfolio/#{model.item.section.to_s.underscore}/#{model.item.title.to_s.underscore}/"
+    path = "portfolio/#{model.item.section.to_s.underscore}/#{model.item.identifier.to_s.underscore}/"
     Rails.env.test? ? "../tmp/#{path}" : path
   end
 
