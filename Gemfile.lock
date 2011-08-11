@@ -74,6 +74,8 @@ GEM
       json (>= 1.2.0)
       multipart-post (>= 1.1.0)
       oauth (>= 0.3.6)
+    dummy_dropbox (0.0.2)
+      dropbox
     erubis (2.7.0)
     execjs (1.2.0)
       multi_json (~> 1.0)
@@ -197,6 +199,7 @@ DEPENDENCIES
   database_cleaner
   devise
   dropbox
+  dummy_dropbox
   factory_girl_rails!
   haml
   haml-rails

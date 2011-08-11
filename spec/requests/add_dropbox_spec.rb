@@ -20,8 +20,6 @@ describe "Adding a dropbox" do
 
     describe "POST /admins/dropboxes" do
       it "should check admin dropbox for that folder" do
-        session_mock = mock('Dropbox::Session')
-        session_mock.should_receive(:list).once.with('test')
         visit new_admin_dropbox_path
         fill_in "folder_name", :with => 'test'
         click_button 'Sync'

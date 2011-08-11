@@ -20,7 +20,6 @@ group :development do
 end
 
 group :test, :development do
-  # gem 'dummy_dropbox'
   gem 'rspec'
   gem 'rspec-rails'
   gem 'capybara'
@@ -28,4 +27,8 @@ group :test, :development do
   gem 'database_cleaner'
   gem 'rcov'
   gem 'factory_girl_rails', :git => 'https://github.com/thoughtbot/factory_girl_rails.git'
+end
+
+group :test do
+  gem 'dummy_dropbox'
 end
