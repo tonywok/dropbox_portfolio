@@ -1,5 +1,5 @@
 Fill::Application.routes.draw do
-  devise_for :admins
+  devise_for :admins, :sign_out_via => [:get]
 
   resources :items, :only => [:show, :index]
 
