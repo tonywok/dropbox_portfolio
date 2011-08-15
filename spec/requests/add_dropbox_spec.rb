@@ -8,7 +8,7 @@ describe "Adding a dropbox" do
     Admin::DropboxesController.any_instance.stub!(:dropbox_session).and_return(@dropbox_session)
   end
 
-  context "logged in as admin" do
+  describe "GET /admins/dropboxes/new" do
     let(:admin) { Factory(:admin) }
 
     before do
@@ -18,12 +18,22 @@ describe "Adding a dropbox" do
       click_button "Sign in"
     end
 
-    describe "POST /admins/dropboxes" do
-      it "should check admin dropbox for that folder" do
-        visit new_admin_dropbox_path
-        fill_in "folder_name", :with => 'test'
-        click_button 'Sync'
-      end
-    end
+    # context "dropbox folder exists" do
+    #   it "should check admin dropbox for that folder" do
+    #     visit new_admin_dropbox_path
+    #     fill_in "folder_name", :with => 'test'
+    #     click_button 'Add'
+    #     within('#dropbox_meta') do
+    #       page.should have_content("Signed in successfully.")
+    #     end
+    #   end
+    # end
+
+    # it "should check admin dropbox for that folder", :js => true do
+    #   visit new_admin_dropbox_path
+    #   fill_in "folder_name", :with => 'dbfolderthatdoesntexist'
+    #   click_button 'Add'
+    #   page.should have_content("Dropbox folder not found")
+    # end
   end
 end

@@ -1,17 +1,29 @@
 require 'ostruct'
-class Admin::DropboxesController < ApplicationController
 
-  before_filter :authenticate_admin! do
-    dropbox_handshake
-  end
+class Admin::DropboxesController < ApplicationController
 
   def new
   end
 
-  def create
+  def index
   end
 
-  def dropbox_handshake
+  def create
+    begin
+      dropbox_session = Dropbox::Session.deserialize(session[:dropbox_session])
+      @db_sync = DropboxSync.new(dropbox_session, params[:folder_name])
+
+      respond_to do |format|
+        format.json { render :json => @db_sync.meta }
+      end
+
+    rescue Dropbox::FileNotFoundError => e
+      flash[:alert] = "Dropbox folder not found"
+      render new_admin_dropbox_path
+    end
+  end
+
+  def authorize
     if params[:oauth_token]
       dropbox_session = Dropbox::Session.deserialize(session[:dropbox_session])
       dropbox_session.authorize

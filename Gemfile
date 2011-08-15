@@ -20,12 +20,15 @@ group :development do
 end
 
 group :test, :development do
+  gem 'guard'
+  gem 'guard-rspec'
+  gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
+  gem 'growl_notify'
   gem 'rspec'
   gem 'rspec-rails'
   gem 'capybara'
   gem 'launchy'
   gem 'database_cleaner'
-  gem 'rcov'
   gem 'factory_girl_rails', :git => 'https://github.com/thoughtbot/factory_girl_rails.git'
 end
 

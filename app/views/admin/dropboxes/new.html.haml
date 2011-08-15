@@ -1,14 +1,22 @@
+- content_for :templates do
+  %script#dropbox_meta_template{:type => "text/template"}
+    <div class='meta_item'>                                   |
+      <img src='https://api.dropbox.com/0/links<%= path %>'/> |
+      <ul>                                                    |
+        <li class='path'><%= path %></li>                     |
+        <li class='revision'><%= revision %></li>             |
+      </ul>                                                   |
+    </div>                                                    |
+
 = link_to 'authorize', authorize_admin_dropboxes_path, :id => 'authorize_dropbox'
 
 %h1 Add dropbox
-= form_tag admin_dropboxes_path do
+= form_tag admin_dropboxes_path, :id => 'add_dropbox' do
 
   .field
     = label_tag :folder_name
     = text_field_tag :folder_name
   .actions
-    = submit_tag 'Sync'
+    = submit_tag 'Add'
 
-- if @imgs
-  - @imgs.each do |path|
-    = image_tag("https://api.dropbox.com/0/links/#{path}")
+#dropbox_meta

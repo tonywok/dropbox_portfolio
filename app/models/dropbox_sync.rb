@@ -4,7 +4,8 @@ class DropboxSync
   def initialize(session, section)
     @session     = session
     @section     = section
-    @meta        = session.ls(section)
+    mode = Rails.env.test? ? :sandbox : :dropbox
+    @meta        = session.ls(section, :mode => mode)
     @parsed_meta = parse
   end
 
