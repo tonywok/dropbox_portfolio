@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110731222506) do
+ActiveRecord::Schema.define(:version => 20110817035602) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                                 :default => "", :null => false
@@ -31,20 +31,16 @@ ActiveRecord::Schema.define(:version => 20110731222506) do
   add_index "admins", ["reset_password_token"], :name => "index_admins_on_reset_password_token", :unique => true
 
   create_table "dropbox_files", :force => true do |t|
-    t.integer  "item_id"
-    t.string   "path"
+    t.integer  "section_id"
+    t.string   "meta_filename"
     t.string   "revision"
     t.string   "attachment"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "items", :force => true do |t|
-    t.string   "title"
-    t.string   "section",     :default => "misc"
-    t.text     "description"
-    t.string   "key"
-    t.string   "identifier"
+  create_table "sections", :force => true do |t|
+    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -3,10 +3,7 @@ class DropboxFile < ActiveRecord::Base
 
   mount_uploader :attachment, AttachmentUploader
 
-  validates :path, :presence => true, :uniqueness => true
-  validates :revision, :presence => true
-  validates :item, :presence => true
-  validates :attachment, :presence => true
+  validates_presence_of :meta_filename, :revision, :section, :attachment
 
   def download(dropbox_session)
     @attachment = dropbox_session.download(path)

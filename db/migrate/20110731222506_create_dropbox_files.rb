@@ -1,8 +1,8 @@
 class CreateDropboxFiles < ActiveRecord::Migration
   def change
     create_table :dropbox_files do |t|
-      t.integer :item_id
-      t.string :path
+      t.integer :section_id
+      t.string :meta_filename
       t.string :revision
       t.string :attachment
 

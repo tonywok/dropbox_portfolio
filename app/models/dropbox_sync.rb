@@ -14,9 +14,9 @@ class DropboxSync
   end
 
   def prune
-    DropboxFile.includes(:sections).
+    DropboxFile.includes(:section).
                 where(:sections => {:name => section.name }).
-                where("dropbox_files.attachment NOT IN (?)", meta_filenames).
+                where("meta_filename NOT IN (?)", meta_filenames).
                 destroy_all
   end
 
