@@ -3,9 +3,6 @@ require 'ostruct'
 class Admin::DropboxesController < ApplicationController
   before_filter :get_dropbox_session
 
-  def new
-  end
-
   def index
     @dropbox_items = @dropbox_session.ls(params[:dir] || '/', :mode => :dropbox)
 
@@ -16,10 +13,10 @@ class Admin::DropboxesController < ApplicationController
   end
 
   def sync
-    dropbox_sync = DropboxSync.new(@dropbox_session)
+    dropbox_sync = DropboxSync.new(@dropbox_session, params[:section])
 
     respond_to do |format|
-      format.json { render :json => dropbox_sync.run(params[:stuff]) }
+      format.json { render :json => dropbox_sync.run(params[:files]) }
     end
   end
 
@@ -28,7 +25,7 @@ class Admin::DropboxesController < ApplicationController
       dropbox_session = Dropbox::Session.deserialize(session[:dropbox_session])
       dropbox_session.authorize
       session[:dropbox_session] = dropbox_session.serialize
-      redirect_to root_path
+      redirect_to admin_dropboxes_path
     else
       dropbox_session = Dropbox::Session.new(DROPBOX_KEY, DROPBOX_SECRET)
       session[:dropbox_session] = dropbox_session.serialize

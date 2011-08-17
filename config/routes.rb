@@ -5,9 +5,10 @@ Fill::Application.routes.draw do
 
   namespace :admin do
     resources :items, :only => [:update, :edit, :destroy, :index]
-    resources :dropboxes, :only => [:new, :create, :index] do
+    resources :dropboxes, :only => [:index] do
       collection do
-        get 'authorize'
+        post 'sync'
+        get  'authorize'
       end
     end
   end

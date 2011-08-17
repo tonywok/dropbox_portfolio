@@ -35,7 +35,6 @@
     initialize: ->
       _.bindAll(this, 'render')
       @template = _.template($('#file_template').html())
-      @render()
 
     render: ->
       $(@el).html(@template(@model.toJSON()))
@@ -45,27 +44,27 @@
     model: DropboxItem
     url: "/admin/dropboxes"
 
+  window.dropbox = new Dropbox()
+
   class window.DropboxView extends Backbone.View
     id: 'dropbox'
 
     initialize: ->
       _.bindAll(this, 'render')
+      @template = _.template($('#dropbox_template').html())
       @collection.bind('reset', @render)
 
     render: ->
-      $el = $(@el).clone().empty()
-      $el.append("<button data-url='admin/dropboxes/sync' class='sync'>Sync</button>")
+      $(@el).html(@template({}))
+      $dropbox_items = this.$('#dropbox_items')
 
-      @collection.each (item) =>
-        dropbox_item = new DropboxItem(item)
-
+      @collection.each (dropbox_item) =>
         if dropbox_item.get('directory?')
           view = new DirectoryView(model: dropbox_item, collection: @collection)
         else
           view = new FileView(model: dropbox_item, collection: @collection)
 
-        $el.append(view.el)
-      $('#dropbox_container').html($el)
+        $dropbox_items.append(view.render().el)
       this
 
     events:
@@ -73,17 +72,27 @@
 
     sync: (event) ->
       event.preventDefault()
-      $.post
+      url = $('button.sync').data('url')
+      data = { section: "foo", files : "[]" }
+      $.post url, data, (resp) ->
+        alert("success")
 
   class window.DropboxSync extends Backbone.Router
     routes:
+      ""        : "home"
       "cd/*dir" : "cd"
 
     initialize: ->
-      @dropbox_view = new DropboxView(collection: new Dropbox())
+      @dropbox_view = new DropboxView(collection: window.dropbox)
+
+    home: ->
+      $("#dropbox_container").empty()
+      $("#dropbox_container").append(@dropbox_view.render().el)
 
     cd: (dir) ->
       @dropbox_view.collection.fetch(data: { dir: dir })
+      $("#dropbox_container").empty()
+      $("#dropbox_container").append(@dropbox_view.render().el)
 
   $(document).ready ->
     window.App = new DropboxSync()

@@ -1,3 +1,5 @@
+require 'json'
+
 class DropboxSync
   attr_accessor :session, :section, :meta
 
@@ -7,7 +9,7 @@ class DropboxSync
   end
 
   def run(meta)
-    @meta = meta
+    @meta = JSON.parse(meta)
     prune
     refresh
     download_new
