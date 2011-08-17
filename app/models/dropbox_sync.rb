@@ -3,7 +3,7 @@ class DropboxSync
 
   def initialize(session, section_name)
     @session = session
-    @section = Section.find_by_name(section_name)
+    @section = Section.find_or_create_by_name(section_name)
   end
 
   def run(meta)
@@ -31,15 +31,17 @@ class DropboxSync
   end
 
   def download_new
-    local_filenames = section.dropbox_files.map(&:name)
 
-    meta.each do |file|
-      if local_filenames.include?(File.basename(file.path))
-        dropbox_file = section.dropbox_files.new(:path => file.path,
-                                                 :revision => file.revision)
-        dropbox_file.download(session)
-        dropbox_file.save
-      end
+    local_filepaths = section.dropbox_files.map(&:meta_path)
+
+    new_files = meta.reject do |dropbox_file|
+      local_filepaths.include? dropbox_file.path
+    end
+
+    new_files.each do |file|
+      dropbox_file = section.dropbox_files.new(:meta_path => file.path, :revision => file.revision)
+      dropbox_file.download(session)
+      dropbox_file.save
     end
   end
 

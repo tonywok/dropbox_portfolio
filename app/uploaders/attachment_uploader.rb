@@ -14,7 +14,6 @@ class AttachmentUploader < CarrierWave::Uploader::Base
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
     path = "portfolio/#{model.section.name.to_s.underscore}/"
-    Rails.env.test? ? "../tmp/#{path}" : path
   end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
