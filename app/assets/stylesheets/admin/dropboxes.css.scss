@@ -1,12 +1,18 @@
 // Place all the styles related to the admin/dropboxes controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-.meta_item {
-  float: left;
+.dropbox_item {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  overflow: none;
+  margin: 10px;
 
-  img {
-    margin: 10px;
-    height: 100px;
-    width: 100px;
+  .directory {
+  }
+
+  .file {
+    img {
+    }
   }
 }

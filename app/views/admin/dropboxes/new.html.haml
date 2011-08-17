@@ -1,12 +1,6 @@
 - content_for :templates do
-  %script#dropbox_meta_template{:type => "text/template"}
-    <div class='meta_item'>                                   |
-      <img src='https://api.dropbox.com/0/links<%= path %>'/> |
-      <ul>                                                    |
-        <li class='path'><%= path %></li>                     |
-        <li class='revision'><%= revision %></li>             |
-      </ul>                                                   |
-    </div>                                                    |
+  = dropbox_file_template
+  = dropbox_folder_template
 
 = link_to 'authorize', authorize_admin_dropboxes_path, :id => 'authorize_dropbox'
 
