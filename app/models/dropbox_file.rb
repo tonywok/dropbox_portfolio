@@ -1,5 +1,5 @@
 class DropboxFile < ActiveRecord::Base
-  belongs_to :item
+  belongs_to :section
 
   mount_uploader :attachment, AttachmentUploader
 
@@ -9,8 +9,7 @@ class DropboxFile < ActiveRecord::Base
   validates :attachment, :presence => true
 
   def download(dropbox_session)
-    self.attachment = dropbox_session.download(path)
-    save
+    @attachment = dropbox_session.download(path)
   end
 
   def replace(dropbox_session)

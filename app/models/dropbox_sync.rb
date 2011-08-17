@@ -1,85 +1,55 @@
 class DropboxSync
-  attr_accessor :session, :section, :path, :meta, :parsed_meta
+  attr_accessor :session, :section, :meta
 
-  def initialize(session, section)
-    @session     = session
-    @section     = section
-    mode = Rails.env.test? ? :sandbox : :dropbox
-    @meta        = session.ls(section, :mode => mode)
-    @parsed_meta = parse
+  def initialize(session, section_name)
+    @session = session
+    @section = Section.find_by_name(section_name)
   end
 
-  def parse
-    meta.inject(HashWithIndifferentAccess.new) do |files_by_item, file|
-      item = parse_item(file.path)
-      files_by_item[item] ||= []
-      files_by_item[item] << { :path     => file.path,
-                               :revision => file.revision }
-      files_by_item
-    end
-  end
-
-  def sync
+  def run(meta)
+    @meta = meta
     prune
     refresh
     download_new
   end
 
   def prune
-    prune_items
-    prune_dropbox_files
-  end
-
-  def prune_items
-    Item.where("section = ? AND identifier NOT IN (?)", section, parsed_meta.keys).destroy_all
-  end
-
-  def prune_dropbox_files
-    DropboxFile.includes(:item).where("items.section = ? AND path NOT IN (?)", section, meta_paths).destroy_all
+    DropboxFile.includes(:sections).
+                where(:sections => {:name => section.name }).
+                where("dropbox_files.attachment NOT IN (?)", meta_filenames).
+                destroy_all
   end
 
   def refresh
-    revised_files    = DropboxFile.includes(:item).where("items.section = ? and revision NOT IN (?)", section, meta_revisions)
-    up_to_date_files = DropboxFile.includes(:item).where("items.section = ? and revision IN (?)", section, meta_revisions)
-
-    up_to_date_files.each do |file|
-      delete_meta_file(file)
-    end
+    revised_files = DropboxFile.includes(:sections).
+                                where(:sections => { :name => section.name }).
+                                where("revision NOT IN (?)", meta_revisions)
 
     revised_files.each do |file|
-      delete_meta_file(file)
       file.replace(session)
     end
   end
 
   def download_new
-    parsed_meta.each_pair do |item_identifier, files|
-      item = Item.find_or_create_by_identifier(:identifier => item_identifier,
-                                               :section    => section)
-      files.each do |file|
-        db_file = item.dropbox_files.new(:path => file[:path], :revision => file[:revision])
-        db_file.download(session)
+    local_filenames = section.dropbox_files.map(&:name)
+
+    meta.each do |file|
+      if local_filenames.include?(File.basename(file.path))
+        dropbox_file = section.dropbox_files.new(:path => file.path,
+                                                 :revision => file.revision)
+        dropbox_file.download(session)
+        dropbox_file.save
       end
     end
   end
 
-  def parse_item(filename)
-    filename.match(%r(.*/([^_.]*))).captures.first.to_sym
-  end
-
   private
 
-  def meta_paths
-    parsed_meta.values.flatten.map { |hash| hash[:path] }
+  def meta_filenames
+    meta.map { |file| File.basename(file.path) }
   end
 
   def meta_revisions
-    parsed_meta.values.flatten.map { |hash| hash[:revision] }
-  end
-
-  def delete_meta_file(file)
-    parsed_meta[file.item.identifier].delete_if do |file_hash|
-      (file_hash[:path] == file.path) && (file_hash[:revision] == file.revision)
-    end
+    meta.map { |file| file.revision }
   end
 end
