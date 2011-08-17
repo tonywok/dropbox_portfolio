@@ -16,12 +16,12 @@ class DropboxSync
   def prune
     DropboxFile.includes(:section).
                 where(:sections => {:name => section.name }).
-                where("meta_filename NOT IN (?)", meta_filenames).
+                where("meta_path NOT IN (?)", meta_filepaths).
                 destroy_all
   end
 
   def refresh
-    revised_files = DropboxFile.includes(:sections).
+    revised_files = DropboxFile.includes(:section).
                                 where(:sections => { :name => section.name }).
                                 where("revision NOT IN (?)", meta_revisions)
 
@@ -45,8 +45,8 @@ class DropboxSync
 
   private
 
-  def meta_filenames
-    meta.map { |file| File.basename(file.path) }
+  def meta_filepaths
+    meta.map { |file| file.path }
   end
 
   def meta_revisions

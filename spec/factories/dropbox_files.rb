@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  sequence :meta_filename do |n|
+  sequence :meta_path do |n|
     "random_file#{n}.png"
   end
 
@@ -9,7 +9,7 @@ FactoryGirl.define do
 
   factory :dropbox_file do
     attachment  File.open(__FILE__)
-    meta_filename Factory.next(:meta_filename)
+    meta_path   Factory.next(:meta_path)
     revision    Factory.next(:revision)
     association :section
   end

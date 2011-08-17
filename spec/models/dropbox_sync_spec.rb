@@ -4,12 +4,12 @@ describe "DropboxSync" do
   describe "#prune" do
     let(:section_name) { 'print' }
     let!(:section) { Factory(:section, :name => section_name) }
-    let!(:meta_filename) { "columbus-brewery-redesign.png" }
-    let!(:unpruned_file) { Factory(:dropbox_file, :meta_filename => meta_filename, :section => section) }
-    let!(:pruned_file) { Factory(:dropbox_file, :meta_filename => "get_pruned.png", :section => section) }
+    let!(:meta_path) { "/foo/bar/columbus-brewery-redesign.png" }
+    let!(:unpruned_file) { Factory(:dropbox_file, :meta_path => meta_path, :section => section) }
+    let!(:pruned_file) { Factory(:dropbox_file, :meta_path => "get_pruned.png", :section => section) }
 
     let(:meta) do
-      [ OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/foo/bar/#{meta_filename}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
+      [ OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
         OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "some/other/path.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false) ]
     end
 
@@ -32,58 +32,42 @@ describe "DropboxSync" do
     end
   end
 
-  # describe "#refresh" do
-  #   let(:section) { 'section_1' }
-  #   let(:revision) { '1041066003' }
-  #   let(:identifier) { "book-covers" }
-  #   let(:dropbox_filepath) { "/#{section}/#{identifier}_the-very-hungry-catapillar.png" }
+  describe "#refresh" do
+    let(:section_name) { 'print' }
+    let(:revision) { '1' }
+    let!(:meta_path) { "columbus-brewery-redesign.png" }
 
-  #   let(:meta) do
-  #     [
-  #       OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "#{dropbox_filepath}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
-  #     ]
-  #   end
+    let(:meta) do
+      [ OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/some/path#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false) ]
+    end
 
-  #   let(:session) { mock('session', :ls => meta, :download => 'content') }
-  #   let(:dropbox) { DropboxSync.new(session, section) }
+    let(:session) { mock('session', :ls => meta, :download => 'content') }
 
-  #   context "same revision" do
-  #     let!(:dropbox_file) do
-  #       Factory(:dropbox_file,
-  #               :revision => revision,
-  #               :path => dropbox_filepath,
-  #               :item => Factory(:item, :identifier => identifier))
-  #     end
+    let(:dropbox) do
+      dropbox = DropboxSync.new(session, section_name)
+      dropbox.meta = meta
+      dropbox
+    end
 
-  #     it "has file in parsed meta collection" do
-  #       files_for_item = dropbox.parsed_meta[identifier]
-  #       files_for_item.map {|file| file[:path] }.should include dropbox_file.path
-  #     end
+    context "same revision" do
+      let!(:up_to_date_file) { Factory(:dropbox_file, :revision => revision, :meta_path => meta_path) }
 
-  #     it "takes no action" do
-  #       session.should_not_receive(:download)
-  #       dropbox.refresh
-  #     end
+      it "takes no action" do
+        session.should_not_receive(:download)
+        dropbox.refresh
+      end
+    end
 
-  #     it "removes up to date file from parsed meta collection" do
-  #       dropbox.refresh
-  #       files_by_item = dropbox.parsed_meta[identifier]
-  #       files_by_item.should_not include dropbox_file.path
-  #     end
-  #   end
+    context "different revision" do
+      let!(:dropbox_file) { Factory(:dropbox_file, :revision => "!!#{revision}!!", :meta_path => meta_path) }
 
-  #   context "different revision" do
-  #     let!(:dropbox_file) do
-  #       Factory(:dropbox_file,
-  #               :revision => "!!#{revision}!!",
-  #               :path => dropbox_filepath,
-  #               :item => Factory(:item, :section => section, :identifier => identifier))
-  #     end
-
-  #     it "replaces the file" do
-  #       session.should_receive(:download).with(dropbox_file.path)
-  #       dropbox.refresh
-  #     end
+      it "replaces the file" do
+        session.should_receive(:download).with(dropbox_file.meta_path)
+        dropbox.refresh
+      end
+    end
+  end
+end
 
   #     it "removes revised file from parsed meta collection" do
   #       dropbox.refresh
@@ -91,7 +75,6 @@ describe "DropboxSync" do
   #       files_by_item.should_not include dropbox_file.path
   #     end
   #   end
-  # end
 
   # describe "#download_new" do
   #   let(:section) { 'section_1' }
@@ -144,4 +127,4 @@ describe "DropboxSync" do
   #     end
   #   end
   # end
-end
+  # end

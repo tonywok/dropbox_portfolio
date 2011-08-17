@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(:version => 20110817035602) do
 
   create_table "dropbox_files", :force => true do |t|
     t.integer  "section_id"
-    t.string   "meta_filename"
+    t.string   "meta_path"
     t.string   "revision"
     t.string   "attachment"
     t.datetime "created_at"
