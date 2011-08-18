@@ -1,7 +1,7 @@
 require 'ostruct'
 
 class Admin::DropboxesController < ApplicationController
-  before_filter :get_dropbox_session
+  before_filter :authenticate, :except => [:authorize]
 
   def index
     @dropbox_items = @dropbox_session.ls(params[:dir] || '/', :mode => :dropbox)
@@ -25,7 +25,7 @@ class Admin::DropboxesController < ApplicationController
       dropbox_session = Dropbox::Session.deserialize(session[:dropbox_session])
       dropbox_session.authorize
       session[:dropbox_session] = dropbox_session.serialize
-      redirect_to admin_dropboxes_path
+      redirect_to admin_dropboxes_url
     else
       dropbox_session = Dropbox::Session.new(DROPBOX_KEY, DROPBOX_SECRET)
       session[:dropbox_session] = dropbox_session.serialize
@@ -35,7 +35,9 @@ class Admin::DropboxesController < ApplicationController
 
   private
 
-  def get_dropbox_session
+  def authenticate
+    return redirect_to(:action => 'authorize') unless session[:dropbox_session]
     @dropbox_session = Dropbox::Session.deserialize(session[:dropbox_session])
+    return redirect_to(:action => 'authorize') unless @dropbox_session.authorized?
   end
 end

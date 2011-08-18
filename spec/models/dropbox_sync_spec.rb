@@ -9,8 +9,8 @@ describe "DropboxSync" do
     let!(:pruned_file) { Factory(:dropbox_file, :meta_path => "get_pruned.png", :section => section) }
 
     let(:meta) do
-      [ OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false),
-        OpenStruct.new(:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "some/other/path.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false) ]
+      [{:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false},
+       {:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "some/other/path.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false}]
     end
 
     let(:session) { mock('session', :ls => meta) }
@@ -38,7 +38,7 @@ describe "DropboxSync" do
     let(:meta_path) { "columbus-brewery-redesign.png" }
 
     let(:meta) do
-      [ OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/some/path#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false) ]
+      [{:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/some/path#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false}]
     end
 
     let(:session) { mock('session', :ls => meta, :download => 'content') }
@@ -75,7 +75,7 @@ describe "DropboxSync" do
     let(:new_meta_path) { "!#{meta_path}!" }
 
     let(:meta) do
-      [ OpenStruct.new(:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => new_meta_path, :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false) ]
+      [{:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => new_meta_path, :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false}]
     end
 
     let(:session) { mock('session', :ls => meta, :download => StringIO.open('spec/fixtures/random.png')) }

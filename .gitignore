@@ -6,3 +6,5 @@ tmp/
 .rvmrc
 config/initializers/dropbox.rb
 public/portfolio/**/*
+.DS_Store
+

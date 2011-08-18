@@ -33,15 +33,14 @@ class DropboxSync
   end
 
   def download_new
-
     local_filepaths = section.dropbox_files.map(&:meta_path)
 
     new_files = meta.reject do |dropbox_file|
-      local_filepaths.include? dropbox_file.path
+      local_filepaths.include? dropbox_file["path"]
     end
 
     new_files.each do |file|
-      dropbox_file = section.dropbox_files.new(:meta_path => file.path, :revision => file.revision)
+      dropbox_file = section.dropbox_files.new(:meta_path => file["path"], :revision => file["revision"])
       dropbox_file.download(session)
       dropbox_file.save
     end
@@ -50,10 +49,10 @@ class DropboxSync
   private
 
   def meta_filepaths
-    meta.map { |file| file.path }
+    meta.map { |file| file["path"] }
   end
 
   def meta_revisions
-    meta.map { |file| file.revision }
+    meta.map { |file| file["revision"] }
   end
 end

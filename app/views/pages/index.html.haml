@@ -1,1 +1,5 @@
+- @sections.each do |section|
+  %p= section.name
+  - section.dropbox_files.each do |dropbox_file|
+    %img{:src => dropbox_file.attachment}
 
