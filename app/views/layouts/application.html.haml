@@ -2,8 +2,7 @@
 %html
   %head
     %title
-    = stylesheet_link_tag "reset", "admin/dropboxes"
-    = stylesheet_link_tag "application"
+    = stylesheet_link_tag "reset", "application"
     = javascript_include_tag "application"
     = csrf_meta_tags
 
@@ -11,27 +10,5 @@
   %body
     %p.notice= notice
     %p.alert= alert
-
-    #sidebar
-      .logo
-
-      %ul#nav
-        %li.with_subcontent
-          = link_to "STUDENT WORK", "#student_work"
-          %ul.sub
-            %li
-              =link_to "sub1", "#"
-              .corner
-            %li
-              =link_to "sub1", "#"
-              .corner
-            %li
-              =link_to "sub1", "#"
-              .corner
-            %li
-              =link_to "sub1", "#"
-              .corner
-        %li= link_to "ABOUT ME", "#"
-        %li= link_to "CONTACT", "#"
 
     = yield
