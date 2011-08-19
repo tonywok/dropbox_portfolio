@@ -6,7 +6,7 @@
         %ul.sub
           - section.dropbox_files.each do |dropbox_file|
             %li
-              =link_to dropbox_file.meta_path, "#"
+              =link_to File.basename(dropbox_file.meta_path), "#"
               .corner
 
     %li= link_to "ABOUT ME", "#"

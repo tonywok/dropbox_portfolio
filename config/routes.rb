@@ -1,10 +1,10 @@
 Fill::Application.routes.draw do
   devise_for :admins, :sign_out_via => [:get]
 
-  resources :items, :only => [:show, :index]
+  resources :dropbox_files, :only => [:show, :index]
 
   namespace :admin do
-    resources :items, :only => [:update, :edit, :destroy, :index]
+    resources :dropbox_items, :only => [:update, :edit, :destroy, :index]
     resources :dropboxes, :only => [:index] do
       collection do
         post 'sync'

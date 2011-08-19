@@ -5,8 +5,8 @@ module Admin::DropboxesHelper
       <<-DB_FILE
         <img src='https://api.dropbox/0/links<%= path %>'/>
         <ul>
-          <li class='path'><%= path %>
-          <li class='revision'><%= revision %>
+          <li class='path'><%= path %></li>
+          <li class='revision'><%= revision %></li>
         </ul>
       DB_FILE
     end
@@ -15,11 +15,8 @@ module Admin::DropboxesHelper
   def directory_template
     template_for(:directory_template) do
       <<-DB_DIRECTORY
-          <a class='path' href='#cd<%= path %>'><%= path %></a>
-          <ul>
-            <li class='revision'><%= revision %></li>
-          </ul>
-        </div>
+        <img src="#{asset_path("directory.png")}"/>
+        <a class='path' href='#cd<%= path %>'><%= path %></a>
       DB_DIRECTORY
     end
   end

@@ -1,0 +1,14 @@
+!!!5
+%html
+  %head
+    %title
+    = stylesheet_link_tag "backend"
+    = javascript_include_tag "backend"
+    = csrf_meta_tags
+
+    = yield :templates
+  %body
+    %p.notice= notice
+    %p.alert= alert
+
+    = yield
