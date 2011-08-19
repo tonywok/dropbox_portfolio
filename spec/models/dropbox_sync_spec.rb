@@ -9,8 +9,8 @@ describe "DropboxSync" do
     let!(:pruned_file) { Factory(:dropbox_file, :meta_path => "get_pruned.png", :section => section) }
 
     let(:meta) do
-      [{:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false},
-       {:revision => '1041066003', :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "some/other/path.png", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false}]
+      [{"revision" => '1041066003', "thumb_exists" => true, "bytes" => 5161,  "modified" => '2011-07-31 18:04:59 -0400', "path" => "#{meta_path}", "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/png", "size" => "5KB", "directory" => false},
+       {"revision" => '1041066003', "thumb_exists" => true, "bytes" => 5161,  "modified" => '2011-07-31 18:04:59 -0400', "path" => "some/other/path.png", "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/png", "size" => "5KB", "directory" => false}]
     end
 
     let(:session) { mock('session', :ls => meta) }
@@ -38,7 +38,7 @@ describe "DropboxSync" do
     let(:meta_path) { "columbus-brewery-redesign.png" }
 
     let(:meta) do
-      [{:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => "/some/path#{meta_path}", :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false}]
+      [{"revision" => revision, "thumb_exists" => true, "bytes" => 5161,  "modified" => '2011-07-31 18:04:59 -0400', "path" => "/some/path#{meta_path}", "is_dir" => false, :icon => "page_white_picture", "mime_type" => "image/png", "size" => "5KB", "directory" => false}]
     end
 
     let(:session) { mock('session', :ls => meta, :download => 'content') }
@@ -59,10 +59,10 @@ describe "DropboxSync" do
     end
 
     context "different revision" do
-      let!(:dropbox_file) { Factory(:dropbox_file, :revision => "!!#{revision}!!", :meta_path => meta_path) }
+      let!(:dropbox_file) { Factory(:dropbox_file, :revision => "!!#{revision}", :meta_path => meta_path) }
 
       it "replaces the file" do
-        session.should_receive(:download).with(dropbox_file.meta_path)
+        session.should_receive(:download)
         dropbox.refresh
       end
     end
@@ -72,13 +72,13 @@ describe "DropboxSync" do
     let(:section_name) { 'print' }
     let(:revision) { '1' }
     let(:meta_path) { "/foo/bar/columbus-brewery-redesign.png" }
-    let(:new_meta_path) { "!#{meta_path}!" }
+    let(:new_meta_path) { "!#{meta_path}" }
 
     let(:meta) do
-      [{:revision => revision, :thumb_exists => true, :bytes => 5161,  :modified => '2011-07-31 18:04:59 -0400', :path => new_meta_path, :is_dir => false, :icon => "page_white_picture", :mime_type => "image/png", :size => "5KB", :directory => false}]
+      [{"revision" => revision, "thumb_exists" => true, "bytes" => 5161,  "modified" => '2011-07-31 18:04:59 -0400', "path" => new_meta_path, "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/png", "size" => "5KB", "directory" => false}]
     end
 
-    let(:session) { mock('session', :ls => meta, :download => StringIO.open('spec/fixtures/random.png')) }
+    let(:session) { mock('session', :ls => meta, :download => "Content") }
 
     let(:dropbox) do
       dropbox = DropboxSync.new(session, section_name)

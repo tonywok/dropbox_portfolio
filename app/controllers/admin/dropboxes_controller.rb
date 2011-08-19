@@ -5,7 +5,7 @@ class Admin::DropboxesController < ApplicationController
   before_filter :authenticate, :except => [:authorize]
 
   def index
-    @dropbox_items = @dropbox_session.ls(params[:dir] || '/', :mode => :dropbox)
+    @dropbox_items = @dropbox_session.ls(params[:dir] || '/')
 
     respond_to do |format|
       format.html
@@ -39,6 +39,7 @@ class Admin::DropboxesController < ApplicationController
   def authenticate
     return redirect_to(:action => 'authorize') unless session[:dropbox_session]
     @dropbox_session = Dropbox::Session.deserialize(session[:dropbox_session])
+    @dropbox_session.mode = (Rails.env.test? ? :sandbox : :dropbox)
     return redirect_to(:action => 'authorize') unless @dropbox_session.authorized?
   end
 end
