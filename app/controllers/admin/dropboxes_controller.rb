@@ -1,6 +1,7 @@
 require 'ostruct'
 
 class Admin::DropboxesController < ApplicationController
+  layout 'backend'
   before_filter :authenticate, :except => [:authorize]
 
   def index
