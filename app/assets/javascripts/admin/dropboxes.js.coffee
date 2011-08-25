@@ -94,12 +94,12 @@
 
     home: ->
       $("#dropbox_container").empty()
-      $("#dropbox_container").append(@dropbox_view.render().el)
+      $("#dropbox_container").append(@dropbox_view.el)
 
     cd: (dir) ->
       @dropbox_view.collection.fetch(data: { dir: dir })
       $("#dropbox_container").empty()
-      $("#dropbox_container").append(@dropbox_view.render().el)
+      $("#dropbox_container").append(@dropbox_view.el)
 
   $(document).ready ->
     window.App = new DropboxSync()
