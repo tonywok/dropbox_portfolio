@@ -1,10 +1,6 @@
-- content_for :templates do
-  = file_template
-  = directory_template
-  = dropbox_template
-  :javascript
-    $(function() {
-      App.dropbox_view.collection.reset(#{@dropbox_items.to_json}); //bootstrap
-    });
+:javascript
+  $(function() {
+    App.dropbox_view.collection.reset(#{@dropbox_items.to_json}); //bootstrap
+  });
 
 #dropbox_container

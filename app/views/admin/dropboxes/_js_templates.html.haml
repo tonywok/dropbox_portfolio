@@ -1,0 +1,20 @@
+%script#dropbox_template{:type => 'text/template'}
+  %button.sync Sync
+  #dropbox_items
+
+%script#directory_template{:type => 'text/template'}
+  %img{:src => asset_path("directory.png")}
+  = link_to(raw('<%= path %>'), raw("#cd<%= path %>"))
+
+%script#file_template{:type => 'text/template'}
+  %img{:src => "https://api.dropbox/0/links<%= path %>"}
+  %ul
+    %li.path "<%= path %>"
+    %li.revision "<%= revision %>"
+
+%script#section_dialog_template{:type => 'text/template'}
+  = form_tag('dropboxes/sync') do
+    = label_tag "Portfolio section: "
+    = text_field_tag :section_name
+    = submit_tag :sync
+
