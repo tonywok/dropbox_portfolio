@@ -8,9 +8,11 @@
       @template = _.template($('#section_dialog_template').html())
 
     render: ->
-      console.log("rendering dialog")
       $(@el).html(@template({}))
       $(@el).dialog(title: 'section dialog')
+
+      section_name = @.$('input#section_name')
+      section_name.autocomplete(source: section_name.data('auto_complete'))
       this
 
     events:
