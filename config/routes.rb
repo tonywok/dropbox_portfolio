@@ -1,7 +1,8 @@
 Fill::Application.routes.draw do
   devise_for :admins, :sign_out_via => [:get]
 
-  resources :dropbox_files, :only => [:show, :index]
+  resources :dropbox_files, :only => [:index]
+  match 'portfolio/:section/:id' => 'dropbox_files#show'
 
   namespace :admin do
     resources :dropbox_items, :only => [:update, :edit, :destroy, :index]

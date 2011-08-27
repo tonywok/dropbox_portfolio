@@ -12,8 +12,7 @@ class DropboxFilesController < ApplicationController
     @dropbox_file = DropboxFile.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @dropbox_file }
+      format.html
     end
   end
 end
