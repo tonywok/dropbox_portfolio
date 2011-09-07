@@ -11,8 +11,8 @@ class DropboxFilesController < ApplicationController
   def show
     @dropbox_file = DropboxFile.find(params[:id])
 
-    respond_to do |format|
-      format.html
+    if request.headers['X-PJAX']
+      render :layout => false
     end
   end
 end
