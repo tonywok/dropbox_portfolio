@@ -4,12 +4,17 @@
     %title
     = javascript_include_tag "frontend"
     = csrf_meta_tags
-
     = yield :templates
   %body
     %p.notice= notice
     %p.alert= alert
 
+    %header
+      %img#logo{:src => asset_path("logo.png")}
+
     = render :partial => "pages/sidebar", :locals => { :sections => Section.includes(:dropbox_files) }
 
-    = yield
+    %section#main
+      = yield
+
+    %footer

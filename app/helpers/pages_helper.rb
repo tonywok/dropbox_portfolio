@@ -4,6 +4,6 @@ module PagesHelper
   end
 
   def portfolio_show_path(dropbox_file)
-    url_for("portfolio/#{dropbox_file.section.name}/#{dropbox_file.id}")
+    url_for("#{root_url}portfolio/#{dropbox_file.section.name}/#{dropbox_file.id}")
   end
 end

@@ -1,4 +1,6 @@
 class DropboxFilesController < ApplicationController
+  layout 'frontend'
+
   def index
     @dropbox_files = DropboxFile.all
 
@@ -13,6 +15,10 @@ class DropboxFilesController < ApplicationController
 
     if request.headers['X-PJAX']
       render :layout => false
+    # else
+    #   respond_to do |format|
+    #     format.html
+    #   end
     end
   end
 end

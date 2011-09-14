@@ -25,7 +25,7 @@
       section_name = $target.find('#section_name').val()
       data = { section_name : section_name, files : @collection.dropbox_files() }
 
-      $.post url, data, (resp) ->
+     $.post url, data, (resp) ->
         alert("success")
 
 )(jQuery)

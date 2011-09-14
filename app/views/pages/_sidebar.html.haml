@@ -1,13 +1,12 @@
-#sidebar
-  %ul#nav
+%nav
+  %ul.sections
     - sections.each do |section|
-      %li.with_subcontent
+      %li
         = link_to section.name.upcase, "##{section.name}"
-        %ul.sub
+        %ul.files
           - section.dropbox_files.each do |dropbox_file|
             %li
               =link_to File.basename(dropbox_file.meta_path), portfolio_show_path(dropbox_file)
-              .corner
 
     %li= link_to "ABOUT ME", "#"
     %li= link_to "CONTACT", "#"

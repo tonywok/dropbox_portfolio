@@ -1,5 +1,5 @@
 = form_for @item do |f|
-  -if @item.errors.any?
+  - if @item.errors.any?
     #error_explanation
       %h2= "#{pluralize(@item.errors.count, "error")} prohibited this item from being saved:"
       %ul
