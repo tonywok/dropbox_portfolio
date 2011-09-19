@@ -13,7 +13,10 @@
     %li.revision "<%= revision %>"
 
 %script#section_dialog_template{:type => 'text/template'}
-  = form_tag('dropboxes/sync') do
-    = label_tag "Portfolio section: "
-    = text_field_tag :section_name, "", :'data-auto_complete' => section_names
-    = submit_tag :sync
+  = form_for Section.new, :url => 'dropboxes/sync' do |f|
+    = f.label :name, "Portfolio section: "
+    = f.text_field :name,:'data-auto_complete' => section_names
+    = f.label :description, "Section description: "
+    = f.text_area :description
+    = f.hidden_field :dropbox_files
+    = f.submit 'sync'

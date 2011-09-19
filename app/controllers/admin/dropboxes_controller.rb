@@ -14,10 +14,10 @@ class Admin::DropboxesController < ApplicationController
   end
 
   def sync
-    dropbox_sync = DropboxSync.new(@dropbox_session, params[:section_name])
+    dropbox_sync = DropboxSync.new(@dropbox_session, params[:section])
 
     respond_to do |format|
-      format.json { render :json => dropbox_sync.run(params[:files]) }
+      format.json { render :json => dropbox_sync.run }
     end
   end
 

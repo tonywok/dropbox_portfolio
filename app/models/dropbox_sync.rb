@@ -3,13 +3,13 @@ require 'json'
 class DropboxSync
   attr_accessor :session, :section, :meta
 
-  def initialize(session, section_name)
+  def initialize(session, section)
     @session = session
-    @section = Section.find_or_create_by_name(section_name)
+    @section = Section.find_or_create_by_name(:name => section['name'], :description => section['description'])
+    @meta    = JSON.parse(section['dropbox_files'])
   end
 
-  def run(meta)
-    @meta = JSON.parse(meta)
+  def run
     prune
     refresh
     download_new

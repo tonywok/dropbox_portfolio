@@ -22,10 +22,13 @@
       event.preventDefault()
       $target = $(event.target)
       url = $target.attr('action')
-      section_name = $target.find('#section_name').val()
-      data = { section_name : section_name, files : @collection.dropbox_files() }
+      data =
+        section:
+          name:          $('#section_name').val()
+          description:   $('#section_description').val()
+          dropbox_files: @collection.dropbox_files()
 
-     $.post url, data, (resp) ->
+      $.post url, data, (resp) ->
         alert("success")
 
 )(jQuery)

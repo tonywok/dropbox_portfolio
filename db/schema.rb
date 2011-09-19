@@ -42,6 +42,7 @@ ActiveRecord::Schema.define(:version => 20110817035602) do
 
   create_table "sections", :force => true do |t|
     t.string   "name"
+    t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

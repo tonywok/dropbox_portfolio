@@ -8,7 +8,6 @@
       @collection.bind('reset', @render)
 
     render: ->
-      console.log("rendering dropboxview")
       $(@el).html(@template({}))
       $dropbox_items = this.$('#dropbox_items')
 
