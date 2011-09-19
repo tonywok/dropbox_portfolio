@@ -79,6 +79,7 @@ GEM
       multi_json (~> 1.0)
     factory_girl (2.0.5)
     ffi (1.0.9)
+    friendly_id (4.0.0.beta12)
     growl_notify (0.0.1)
       rb-appscript
     guard (0.6.2)
@@ -206,6 +207,7 @@ DEPENDENCIES
   dropbox
   dummy_dropbox
   factory_girl_rails!
+  friendly_id (~> 4.0.0.beta8)
   growl_notify
   guard
   guard-rspec

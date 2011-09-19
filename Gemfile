@@ -6,6 +6,7 @@ gem 'haml'
 gem 'devise'
 gem 'dropbox'
 gem 'carrierwave'
+gem 'friendly_id', '~> 4.0.0.beta8'
 
 group :assets do
   gem 'sass-rails', "~> 3.1.0.rc"

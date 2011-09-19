@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110817035602) do
+ActiveRecord::Schema.define(:version => 20110919030444) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                                 :default => "", :null => false
@@ -38,13 +38,19 @@ ActiveRecord::Schema.define(:version => 20110817035602) do
     t.string   "attachment"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "slug"
   end
+
+  add_index "dropbox_files", ["slug"], :name => "index_dropbox_files_on_slug", :unique => true
 
   create_table "sections", :force => true do |t|
     t.string   "name"
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "slug"
   end
+
+  add_index "sections", ["slug"], :name => "index_sections_on_slug", :unique => true
 
 end
