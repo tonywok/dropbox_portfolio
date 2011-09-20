@@ -21,10 +21,6 @@ group :development do
 end
 
 group :test, :development do
-  gem 'guard'
-  gem 'guard-rspec'
-  gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
-  gem 'growl_notify'
   gem 'rspec'
   gem 'rspec-rails'
   gem 'capybara'
