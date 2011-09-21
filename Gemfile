@@ -18,6 +18,7 @@ group :development do
   gem 'haml-rails'
   gem 'sqlite3'
   gem 'ruby-debug19', :require => 'ruby-debug'
+  gem 'capistrano'
 end
 
 group :test, :development do
