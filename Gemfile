@@ -8,9 +8,13 @@ gem 'dropbox'
 gem 'carrierwave'
 gem 'friendly_id', '~> 4.0.0.beta8'
 
+group :production do
+  gem 'pg'
+end
+
 group :assets do
-  gem 'sass-rails', "~> 3.1.0.rc"
-  gem 'coffee-rails', "~> 3.1.0.rc"
+  gem 'sass-rails'
+  gem 'coffee-rails'
   gem 'uglifier'
 end
 
