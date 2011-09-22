@@ -20,7 +20,5 @@ test:
 
 production:
   adapter: postgresql
-  host: localhost
-  username: tonywok
   database: dropbox_portfolio_production
   encoding: utf8
