@@ -14,6 +14,7 @@ set :deploy_to, "/var/www/dropbox_portfolio"
 set :domain, "echo.agrieser.net"
 
 set :scm, "git"
+set :git_enable_submodules, 1
 set :rake, "bundle exec rake"
 set :ssh_options, { :forward_agent => true }
 set :deploy_via, :remote_cache
