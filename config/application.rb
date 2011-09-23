@@ -53,5 +53,8 @@ module Fill
                                :routing => false)
       g.fixture_replacement(:factory_girl, :dir => 'spec/factories')
     end
+
+    # manifests for precompilation
+    config.assets.precompile += ['frontend.js', 'frontend.css', 'backend.js', 'backend.css']
   end
 end

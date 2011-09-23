@@ -26,18 +26,6 @@ role :db, domain, :primary => true
 set :rails_env, "production"
 set :branch, "production"
 
-before "deploy:restart", "assets:precompile"
-
-namespace :assets do
-  task :precompile, :roles => :web do
-    run "cd #{current_path} && RAILS_ENV=production bundle exec rake assets:precompile"
-  end
-
-  task :cleanup, :roles => :web do
-    run "cd #{current_path} && RAILS_ENV=production bundle exec rake assets:clean"
-  end
-end
-
 namespace :deploy do
   task :start do ; end
   task :stop do ; end
