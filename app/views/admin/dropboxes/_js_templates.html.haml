@@ -3,7 +3,7 @@
   #dropbox_items
 
 %script#directory_template{:type => 'text/template'}
-  %img{:src => asset_path("directory.png")}
+  = image_tag("directory.png")
   = link_to(raw('<%= path %>'), raw("#cd<%= path %>"))
 
 %script#file_template{:type => 'text/template'}
