@@ -53,6 +53,6 @@ class DropboxSync
   end
 
   def meta_revisions
-    meta.map { |file| file["revision"] }
+    meta.map { |file| file["revision"].to_s }
   end
 end
