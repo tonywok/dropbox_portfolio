@@ -18,14 +18,14 @@ class DropboxSync
   def prune
     DropboxFile.includes(:section).
                 where(:sections => {:name => section.name }).
-                where("meta_path NOT IN (?)", meta_filepaths).
+                where('"meta_path" NOT IN (?)', meta_filepaths).
                 destroy_all
   end
 
   def refresh
     revised_files = DropboxFile.includes(:section).
                                 where(:sections => { :name => section.name }).
-                                where("revision NOT IN (?)", meta_revisions)
+                                where('"revision" NOT IN (?)', meta_revisions)
 
     revised_files.each do |file|
       file.replace(session)
