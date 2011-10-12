@@ -5,7 +5,7 @@ class DropboxSync
 
   def initialize(session, section)
     @session = session
-    @section = Section.find_or_create_by_name(:name => section['name'], :description => section['description'])
+    @section = Section.find_or_initialize_by_name(:name => section['name'], :description => section['description'])
     @meta    = JSON.parse(section['dropbox_files'])
   end
 
@@ -39,11 +39,13 @@ class DropboxSync
       local_filepaths.include? dropbox_file["path"]
     end
 
-    new_files.each do |file|
+    new_dropbox_files = new_files.map do |file|
       dropbox_file = section.dropbox_files.new(:meta_path => file["path"], :revision => file["revision"])
       dropbox_file.download(session)
-      dropbox_file.save
+      dropbox_file
     end
+
+    section.update_attributes(:dropbox_files => new_dropbox_files)
   end
 
   private
