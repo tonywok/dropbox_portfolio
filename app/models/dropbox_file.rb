@@ -11,10 +11,4 @@ class DropboxFile < ActiveRecord::Base
     self.attachment = DropboxStringIO.new(meta_path, file_content)
   end
 
-  def replace(dropbox_session)
-    file_content = dropbox_session.download(meta_path, :mode => :dropbox)
-    File.open(attachment.path, 'w+b') do |file|
-      file.write(file_content)
-    end
-  end
 end
