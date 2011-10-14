@@ -1,60 +1,54 @@
 require 'json'
 
 class DropboxSync
-  attr_accessor :session, :section, :meta
+  attr_accessor :session, :section, :remote_dropbox_files
 
-  def initialize(session, section)
-    @session = session
-    @section = Section.find_or_initialize_by_name(:name => section['name'], :description => section['description'])
-    @meta    = JSON.parse(section['dropbox_files'])
+  def initialize(session, data)
+    @session              = session
+    @section              = Section.find_or_initialize_by_name(:name => data['name'])
+    @section.description  = data["description"]
+    @remote_dropbox_files = JSON.parse(data['dropbox_files'])
   end
 
   def run
-    prune
-    refresh
-    download_new
+    if section.new_record?
+      download(remote_dropbox_files)
+    else
+      prune
+      download(new_remote_files)
+    end
   end
 
   def prune
     DropboxFile.includes(:section).
-                where(:sections => {:name => section.name }).
-                where('"meta_path" NOT IN (?)', meta_filepaths).
-                destroy_all
+                where(:sections => { :name => section.name }).
+                where('"meta_path" NOT IN (?)', meta_filepaths).destroy_all
   end
 
-  def refresh
-    revised_files = DropboxFile.includes(:section).
-                                where(:sections => { :name => section.name }).
-                                where('"revision" NOT IN (?)', meta_revisions)
-
-    revised_files.each do |file|
-      file.replace(session)
+  def new_remote_files
+    remaining_lookup = section.dropbox_files.inject({}) do |remaining, file|
+      remaining[file.meta_path] = file.revision
+      remaining
     end
+
+    remote_dropbox_files.reject { |file| remaining_lookup[file["path"]] == file["revision"] }
   end
 
-  def download_new
-    local_filepaths = section.dropbox_files.map(&:meta_path)
-
-    new_files = meta.reject do |dropbox_file|
-      local_filepaths.include? dropbox_file["path"]
-    end
-
+  def download(new_files)
     new_dropbox_files = new_files.map do |file|
       dropbox_file = section.dropbox_files.new(:meta_path => file["path"], :revision => file["revision"])
       dropbox_file.download(session)
       dropbox_file
     end
 
-    section.update_attributes(:dropbox_files => new_dropbox_files)
+    section.update_attributes(:description => section.description,
+                              :dropbox_files => new_dropbox_files)
   end
 
   private
 
   def meta_filepaths
-    meta.map { |file| file["path"] }
+    remote_dropbox_files.map { |file| file["path"] }
   end
 
-  def meta_revisions
-    meta.map { |file| file["revision"].to_s }
-  end
 end

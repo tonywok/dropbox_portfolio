@@ -4,7 +4,6 @@ class Section < ActiveRecord::Base
 
   has_many :dropbox_files, :dependent => :destroy
 
-  validates :name, :presence   => true,
-                   :uniqueness => true
-  validates :dropbox_files, :presence => true
+  validates_presence_of   :name, :dropbox_files
+  validates_uniqueness_of :name
 end
