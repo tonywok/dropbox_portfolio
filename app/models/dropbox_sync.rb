@@ -7,7 +7,7 @@ class DropboxSync
     @session              = session
     @section              = Section.find_or_initialize_by_name(:name => data['name'])
     @section.description  = data["description"]
-    @remote_dropbox_files = JSON.parse(data['dropbox_files'])
+    @remote_dropbox_files = JSON.parse(data["dropbox_files"])
   end
 
   def run

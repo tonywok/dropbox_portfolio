@@ -14,6 +14,7 @@ class Admin::DropboxesController < ApplicationController
   end
 
   def sync
+    params[:section][:dropbox_files] = JSON.parse(params[:section][:dropbox_files]) # TODO: only send JSON
     dropbox_sync = DropboxSync.new(@dropbox_session, params[:section])
 
     respond_to do |format|
@@ -42,4 +43,5 @@ class Admin::DropboxesController < ApplicationController
     @dropbox_session.mode = (Rails.env.test? ? :sandbox : :dropbox)
     return redirect_to(:action => 'authorize') unless @dropbox_session.authorized?
   end
+
 end
