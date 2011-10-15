@@ -11,11 +11,16 @@ class DropboxSync
   end
 
   def run
+    begin
     if section.new_record?
       download(remote_dropbox_files)
     else
       prune
       download(new_remote_files)
+    end
+
+    rescue Exception => e
+      logger.debug(e.inspect)
     end
   end
 
