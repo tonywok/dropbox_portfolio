@@ -11,6 +11,5 @@ FactoryGirl.define do
     attachment  File.open(__FILE__)
     meta_path   Factory.next(:meta_path)
     revision    Factory.next(:revision)
-    association :section
   end
 end
