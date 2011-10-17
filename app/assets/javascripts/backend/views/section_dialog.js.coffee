@@ -20,15 +20,11 @@
 
     sync: (event) ->
       event.preventDefault()
-      $target = $(event.target)
-      url = $target.attr('action')
-      data =
-        section:
-          name:          $('#section_name').val()
-          description:   $('#section_description').val()
-          dropbox_files: @collection.dropbox_files()
+      attrs =
+        name: $('#section_name').val()
+        description: $('#section_description').val()
+        dropbox_files: @collection.dropbox_files()
 
-      $.post url, data, (resp) ->
-        alert("success")
+      new Section(attrs).save()
 
 )(jQuery)

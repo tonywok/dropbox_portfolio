@@ -17,7 +17,7 @@ class Admin::DropboxesController < ApplicationController
     dropbox_sync = DropboxSync.new(@dropbox_session, params[:section])
 
     respond_to do |format|
-      format.json { render :json => dropbox_sync.run }
+      format.json { render :json => { :status => (dropbox_sync.run ? "worked" : "error") } }
     end
   end
 
