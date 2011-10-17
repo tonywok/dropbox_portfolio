@@ -26,10 +26,35 @@ role :db, domain, :primary => true
 set :rails_env, "production"
 set :branch, "production"
 
+set :shared_assets, "public/portfolio"
+
 namespace :deploy do
   task :start do ; end
   task :stop do ; end
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
   end
+end
+
+namespace :uploads do
+  desc "Creates the upload folders unless they exist, sets permissions"
+  task :setup, :except => { :no_release => true } do
+    dirs = uploads_dirs.map { |d| File.join(shared_path, d) }
+    run "#{try_sudo} mkdir -p #{dirs.join(' ')} && #{try_sudo} chmod g+w #{dirs.join(' ')}"
+  end
+
+  desc "Creates the symlink to uploads shared folder for most recent version"
+  task :symlink, :except => { :no_release => true } do
+    run "rm -rf #{release_path}/public/portfolio"
+    run "ln -nfs #{shared_path}/uploads #{release_path}/public/portfolio"
+  end
+
+  desc "Computes uploads directory paths and registers them in Capistrano environment"
+  task :register_dirs do
+    set :uploads_dirs,    %w(uploads)
+    set :shared_children, fetch(:shared_children) + fetch(:uploads_dirs)
+  end
+
+  after       "deploy:finalize_update", "uploads:symlink"
+  on :start,  "uploads:register_dirs"
 end
