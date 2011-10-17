@@ -9,11 +9,12 @@ describe "DropboxSync" do
                                               :dropbox_files => [ Factory.build(:dropbox_file, :meta_path => unpruned_meta_path),
                                                                   Factory.build(:dropbox_file, :meta_path => pruned_meta_path) ]) }
     let(:remote_data) do
-      { "name"          => "#{section_name}",
-        "description"   => "lorem ipsum dolar",
-        "dropbox_files" => "[{\"revision\":1041066054,\"thumb_exists\":true,\"bytes\":6646,\"modified\":\"2011-08-19T15:05:03-04:00\",\"path\":\"#{unpruned_meta_path}\",\"is_dir\":false,\"icon\":\"page_white_picture\",\"mime_type\":\"image/png\",\"size\":\"6.5KB\",\"directory?\":false},
-                             {\"revision\":1041065999,\"thumb_exists\":true,\"bytes\":76278,\"modified\":\"2011-07-30T19:47:32-04:00\",\"path\":\"/test/mewithmustache.jpeg\",\"is_dir\":false,\"icon\":\"page_white_picture\",\"mime_type\":\"image/jpeg\",\"size\":\"74.5KB\",\"directory?\":false},
-                             {\"revision\":1041066057,\"thumb_exists\":true,\"bytes\":567324,\"modified\":\"2011-08-20T12:15:16-04:00\",\"path\":\"/test/nancers.jpeg\",\"is_dir\":false,\"icon\":\"page_white_picture\",\"mime_type\":\"image/jpeg\",\"size\":\"554KB\",\"directory?\":false}]" }
+      HashWithIndifferentAccess.new(
+        { :name          => "#{section_name}",
+          :description   => "lorem ipsum dolar",
+          :dropbox_files => [{"revision" => 1041066054, "thumb_exists" => true, "bytes" => 66463, "modified" => "2011-08-19T15:05:03-04:00", "path" => "#{unpruned_meta_path}", "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/png", "size" => "6.5KB", "directory?" => false },
+                             {"revision" => 1041065999, "thumb_exists" => true, "bytes" => 76278, "modified" => "2011-07-30T19:47:32-04:00", "path" => "/test/mewithmustache.jpeg", "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/jpeg", "size" => "74.5KB", "directory?" => false },
+                             {"revision" => 1041066057, "thumb_exists" => true, "bytes" => 56732, "modified" => "2011-08-20T12:15:16-04:00", "path" => "/test/nancers.jpeg", "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/jpeg", "size" => "554KB", "directory?" => false }] })
     end
 
     let(:session) { mock('session') }
@@ -32,16 +33,19 @@ describe "DropboxSync" do
 
   describe "#new_remote_files" do
     let(:section_name) { 'print' }
-    let!(:up_to_date_revision) { "1" }
-    let!(:out_of_date_revision) { "2" }
+    let!(:up_to_date_path) { "/test/file1.png" }
+    let!(:out_of_date_path) { "/test/file2.png" }
+    let!(:up_to_date_revision) { 1 }
+    let!(:out_of_date_revision) { 2 }
     let!(:section) { Factory.create(:section, :name          => section_name,
-                                              :dropbox_files => [ Factory.build(:dropbox_file, :revision => up_to_date_revision),
-                                                                  Factory.build(:dropbox_file, :revision => out_of_date_revision) ]) }
+                                              :dropbox_files => [ Factory.build(:dropbox_file, :meta_path => up_to_date_path, :revision => up_to_date_revision.to_s),
+                                                                  Factory.build(:dropbox_file, :meta_path => out_of_date_path, :revision => out_of_date_revision.to_s) ]) }
     let(:remote_data) do
-      { "name"          => "#{section_name}",
-        "description"   => "lorem ipsum dolar",
-        "dropbox_files" => "[{\"revision\":#{up_to_date_revision},\"thumb_exists\":true,\"bytes\":76278,\"modified\":\"2011-07-30T19:47:32-04:00\",\"path\":\"/test/mewithmustache.jpeg\",\"is_dir\":false,\"icon\":\"page_white_picture\",\"mime_type\":\"image/jpeg\",\"size\":\"74.5KB\",\"directory?\":false},
-                             {\"revision\":#{out_of_date_revision},\"thumb_exists\":true,\"bytes\":567324,\"modified\":\"2011-08-20T12:15:16-04:00\",\"path\":\"/test/nancers.jpeg\",\"is_dir\":false,\"icon\":\"page_white_picture\",\"mime_type\":\"image/jpeg\",\"size\":\"554KB\",\"directory?\":false}]" }
+      HashWithIndifferentAccess.new(
+        { "name"          => "#{section_name}",
+          "description"   => "lorem ipsum dolar",
+          "dropbox_files" => [{"revision" => up_to_date_revision, "thumb_exists" => true, "bytes" => 76278, "modified" => "2011-07-30T19:47:32-04:00", "path" => up_to_date_path, "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/jpeg", "size" => "74.5KB", "directory?" => false },
+                              {"revision" => out_of_date_revision, "thumb_exists" => true, "bytes" => 56732, "modified" => "2011-08-20T12:15:16-04:00", "path" => out_of_date_path, "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/jpeg", "size" => "554KB", "directory?" => false }] })
     end
 
     let(:session) { mock('session') }
@@ -55,16 +59,21 @@ describe "DropboxSync" do
     it "accepts remote dropbox files that are out of date locally" do
       remote_file_revisions.should_not include(out_of_date_revision)
     end
+
+    it "does not clobber dropbox files when there are no new files" do
+      pending
+    end
   end
 
   describe "#download" do
     let(:section_name) { 'print' }
     let!(:section) { Factory.build(:section, :name => section_name) }
     let(:remote_data) do
+      HashWithIndifferentAccess.new(
       { "name"          => "#{section_name}",
         "description"   => "lorem ipsum dolar",
-        "dropbox_files" => "[{\"revision\":1041066054,\"thumb_exists\":true,\"bytes\":76278,\"modified\":\"2011-07-30T19:47:32-04:00\",\"path\":\"/test/mewithmustache.jpeg\",\"is_dir\":false,\"icon\":\"page_white_picture\",\"mime_type\":\"image/jpeg\",\"size\":\"74.5KB\",\"directory?\":false},
-                             {\"revision\":1041065999,\"thumb_exists\":true,\"bytes\":567324,\"modified\":\"2011-08-20T12:15:16-04:00\",\"path\":\"/test/nancers.jpeg\",\"is_dir\":false,\"icon\":\"page_white_picture\",\"mime_type\":\"image/jpeg\",\"size\":\"554KB\",\"directory?\":false}]" }
+        "dropbox_files" => [{"revision" => 1041066054, "thumb_exists" => true, "bytes" => 76278, "modified" => "2011-07-30T19:47:32-04:00", "path" => "/test/mewithmustache.jpeg", "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/jpeg", "size" => "74.5KB", "directory?" => false },
+                            {"revision" => 1041065999, "thumb_exists" => true, "bytes" => 56732, "modified" => "2011-08-20T12:15:16-04:00", "path" => "/test/nancers.jpeg", "is_dir" => false, "icon" => "page_white_picture", "mime_type" => "image/jpeg", "size" => "554KB", "directory?" => false }] })
     end
     let(:session) { mock('session', :download => "Remote Content") }
     let(:dropbox) { DropboxSync.new(session, remote_data) }

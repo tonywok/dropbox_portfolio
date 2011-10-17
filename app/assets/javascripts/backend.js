@@ -5,5 +5,6 @@
 //= require jquery_ujs
 //= require ./backend/models/dropbox_item
 //= require ./backend/models/dropbox
+//= require ./backend/models/section
 //= require_directory ./backend/views
 //= require_directory ./backend/routers
