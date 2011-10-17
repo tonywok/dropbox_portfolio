@@ -1,0 +1,11 @@
+@media all and (-webkit-max-device-pixel-ratio: 2) and (orientation: portrait) {
+  a {
+    color: red;
+  }
+}
+
+@media all and (-webkit-max-device-pixel-ratio: 2) and (orientation: landscape) {
+  a {
+    color: green;
+  }
+}
