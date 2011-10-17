@@ -7,6 +7,7 @@ class DropboxSync
     @session              = session
     @remote_dropbox_files = params.delete(:dropbox_files)
     @section              = Section.find_or_initialize_by_name(params)
+    @section.description  = params[:description]
   end
 
   def run
@@ -31,22 +32,29 @@ class DropboxSync
   end
 
   def new_remote_files
-    remaining_lookup = section.dropbox_files.inject({}) do |remaining, file|
-      remaining[file.meta_path] = file.revision
-      remaining
+    @new_remote_files ||= remote_dropbox_files.reject do |file|
+      remaining_lookup[file["path"]] == file["revision"].to_s
     end
-
-    remote_dropbox_files.reject { |file| remaining_lookup[file["path"]] == file["revision"].to_s }
   end
 
   def download(new_files)
-    new_dropbox_files = new_files.map do |file|
-      dropbox_file = section.dropbox_files.new(:meta_path => file[:path], :revision => file[:revision].to_s)
-      dropbox_file.download(session)
-      dropbox_file
+    unless new_files.empty?
+      section.dropbox_files = new_files.map do |file|
+        dropbox_file = section.dropbox_files.new(:meta_path => file[:path], :revision => file[:revision].to_s)
+        dropbox_file.download(session)
+        dropbox_file
+      end
     end
 
-    section.update_attributes(:description => section.description,
-                              :dropbox_files => new_dropbox_files)
+    section.save
+  end
+
+  private
+
+  def remaining_lookup
+    @remaining_lookup ||= section.dropbox_files.inject({}) do |remaining, file|
+      remaining[file.meta_path] = file.revision
+      remaining
+    end
   end
 end

@@ -59,6 +59,10 @@ describe "DropboxSync" do
     it "accepts remote dropbox files that are out of date locally" do
       remote_file_revisions.should_not include(out_of_date_revision)
     end
+
+    it "does not clobber dropbox files when there are no new files" do
+      pending
+    end
   end
 
   describe "#download" do
