@@ -3,6 +3,7 @@ require 'ostruct'
 class Admin::DropboxesController < ApplicationController
   layout 'backend'
   before_filter :authenticate, :except => [:authorize]
+  before_filter :cleanse_params, :only => [:sync]
 
   def index
     @dropbox_items = @dropbox_session.ls(params[:dir] || '/')
@@ -41,6 +42,10 @@ class Admin::DropboxesController < ApplicationController
     @dropbox_session = Dropbox::Session.deserialize(session[:dropbox_session])
     @dropbox_session.mode = (Rails.env.test? ? :sandbox : :dropbox)
     return redirect_to(:action => 'authorize') unless @dropbox_session.authorized?
+  end
+
+  def cleanse_params
+    params[:section].slice!("name", "description", "dropbox_files")
   end
 
 end
