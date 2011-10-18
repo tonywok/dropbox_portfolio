@@ -20,7 +20,7 @@ class DropboxSync
     end
 
     rescue Exception => e
-      Rails.logger.debug(e.inspect)
+      Rails.logger.fatal(e.inspect)
     end
   end
 
@@ -47,6 +47,9 @@ class DropboxSync
     end
 
     section.save
+
+  rescue Exception => e
+    Rails.logger.fatal e.inspect
   end
 
   private
