@@ -15,22 +15,14 @@ class Admin::DropboxesController < ApplicationController
   end
 
   def sync
-    begin
     dropbox_sync = DropboxSync.new(@dropbox_session, params[:section])
 
     respond_to do |format|
       if dropbox_sync.run
-        Rails.logger.fatal("DROPBOX_SYNC RUN WORKED")
         format.json { render :json => { :status => "success" }}
       else
-        Rails.logger.fatal("DROPBOX_SYNC RUN FAILED")
         format.json { render :json => { :status => "failure" }}
       end
-    end
-    rescue Exception => e
-      Rails.logger("!"*100)
-      Rails.logger.fatal(e.inspect)
-      Rails.logger("!"*100)
     end
   end
 
