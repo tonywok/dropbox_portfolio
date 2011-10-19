@@ -1,11 +1,49 @@
-@media all and (-webkit-max-device-pixel-ratio: 2) and (orientation: portrait) and (max-width: 320px) {
+// iPhone v(4,4S) portrait
+// test: black text (overwritten by v* portrait) with blue background
+@media all and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
   a {
+    background-color: blue;
     color: red;
   }
 }
 
-@media all and (-webkit-max-device-pixel-ratio: 2) and (orientation: landscape) and (max-width: 480px) {
+// iPhone v(4/4S) landscape
+// test: orange text (overwritten by v* landscape) with green background
+@media all and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape) {
   a {
-    color: green;
+    background-color: green;
+    color: red;
+  }
+}
+
+// iPhone v(*) portrait
+// test: black text
+@media all and (max-device-width: 480px) and (orientation: portrait)  {
+  a {
+    color: black;
+  }
+}
+
+// iPhone v(*) landscape
+// test: orange text
+@media all and (max-device-width: 480px) and (orientation: landscape)  {
+  a {
+    color: orange;
+  }
+}
+
+// iPad portrait
+// test: yellow text
+@media all and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+  a {
+    color: yellow;
+  }
+}
+
+// iPad landscape
+// test: purple text
+@media all and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+  a {
+    color:  purple;
   }
 }
