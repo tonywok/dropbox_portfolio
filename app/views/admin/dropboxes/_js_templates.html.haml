@@ -1,9 +1,4 @@
-%script#dropbox_template{:type => 'text/template'}
-  %button.sync Sync
-  #dropbox_items
-
 %script#directory_template{:type => 'text/template'}
-  = image_tag("directory.png")
   = link_to(raw('<%= path %>'), raw("#cd<%= path %>"))
 
 %script#file_template{:type => 'text/template'}

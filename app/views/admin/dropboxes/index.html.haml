@@ -1,6 +1,8 @@
 :javascript
   $(function() {
-    App.dropbox_view.collection.reset(#{@dropbox_items.to_json}); //bootstrap
+    window.init();
+    App.DirsCollection.reset(#{@dirs.to_json});
+    App.FilesCollection.reset(#{@files.to_json});
   });
 
 #dropbox_container

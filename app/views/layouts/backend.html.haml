@@ -2,14 +2,23 @@
 %html
   %head
     %title
-    -# = stylesheet_link_tag "backend"
+    = stylesheet_link_tag "backend"
     = stylesheet_link_tag "/stylesheets/jquery-ui-1.8.16.custom.css" #not asset packaged
     = javascript_include_tag "backend"
     = csrf_meta_tags
 
     = render :partial => "admin/dropboxes/js_templates"
   %body
-    %p.notice= notice
-    %p.alert= alert
+    %header
+    #container
+      #dropbox_dirs
+        %h2 Lorem
+      #dropbox_files
+        - unless notice.nil?
+          %p.notice= notice
+        - unless alert.nil?
+          %p.alert= alert
+        = yield
+      %footer
 
-    = yield
+
