@@ -2,11 +2,13 @@
   class window.FileView extends Backbone.View
     className: "dropbox_item file"
 
-    initialize: ->
+    initialize: (data) ->
       _.bindAll(this, 'render')
       @template = _.template($('#file_template').html())
+      @render()
 
     render: ->
-      $(@el).html(@template(@model.toJSON()))
-      this
+      file = $(@el).html(@template(@model.toJSON()))
+      file.appendTo("#dropbox_files")
+
 )(jQuery)

@@ -61,5 +61,10 @@ module Fill
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # compass configurations
+    stylesheets_directory = "#{Rails.root}/app/assets/stylesheets"
+    config.assets.precompile << /(^[^_]|\/[^_])[^\/]*/
+    config.sass.preferred_syntax = :sass
   end
 end

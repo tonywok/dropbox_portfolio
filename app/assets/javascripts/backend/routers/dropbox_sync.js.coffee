@@ -1,22 +1,19 @@
 (($) ->
   class window.DropboxSync extends Backbone.Router
     routes:
-      ""        : "home"
       "cd/*dir" : "cd"
 
-    home: ->
-      @dropbox_view = new DropboxView(collection: window.dropbox)
-      $("#dropbox_container").empty()
-      $("#dropbox_container").append(@dropbox_view.el)
-
     cd: (dir) ->
-      @dropbox_view = new DropboxView(collection: window.dropbox)
-      @dropbox_view.collection.fetch(data: { dir: dir })
-      $("#dropbox_container").empty()
-      $("#dropbox_container").append(@dropbox_view.el)
+      $.getJSON '/admin/dropboxes', { dir: dir }, (data) =>
+        if _.isEmpty(data.dirs)  then @DirsCollection.reset()  else @DirsCollection.reset(data.dirs)
+        if _.isEmpty(data.files) then @FilesCollection.reset() else @FilesCollection.reset(data.files)
 
-  $(document).ready ->
-    window.App = new DropboxSync()
+  window.init = ->
+    window.App          = new DropboxSync()
+    App.DirsCollection  = new DirsCollection()
+    App.FilesCollection = new FilesCollection()
+    App.DirsView        = new DirsCollectionView(collection: App.DirsCollection, el: $('#dropbox_dirs'))
+    App.FilesView       = new FilesCollectionView(collection: App.FilesCollection, el: $('dropbox_files'))
     Backbone.history.start(root: '/admin/dropboxes')
 
 )(jQuery)

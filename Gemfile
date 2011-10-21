@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails'
+gem 'rails', '~> 3.1.0'
 gem 'jquery-rails'
 gem 'haml'
 gem 'devise'
@@ -13,9 +13,12 @@ group :production do
 end
 
 group :assets do
-  gem 'sass-rails'
-  gem 'coffee-rails'
+  gem 'sass-rails', '~> 3.1.0'
+  gem 'coffee-rails', '~> 3.1.0'
   gem 'uglifier'
+  gem 'compass', '~> 0.12.alpha'
+  # include compass plugins here E.g:
+  # gem 'compass-susy-plugin', :require => 'susy'
 end
 
 group :development do

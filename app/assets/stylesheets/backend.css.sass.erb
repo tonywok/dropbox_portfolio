@@ -1,0 +1,31 @@
+@import partials/base
+
+$border_dark   : #333
+$bg_light      : #fff
+
+html, body
+  height: 100%
+
+body
+  +blueprint(true)
+  background-image: url(<%= asset_path('white_texture_bg.png') %>)
+
+#container
+  +container
+
+header
+  +column(24)
+
+footer
+  +column(24)
+
+#dropbox_files
+  +column(19, true)
+  background-color: $bg_light
+  height: 100%
+
+#dropbox_dirs
+  +column(5)
+  font-size: 1.5em
+  height: 100%
+

@@ -6,11 +6,12 @@ class Admin::DropboxesController < ApplicationController
   before_filter :cleanse_params, :only => [:sync]
 
   def index
-    @dropbox_items = @dropbox_session.ls(params[:dir] || '/')
+    dropbox_items = @dropbox_session.ls(params[:dir] || '/')
+    @dirs, @files = dropbox_items.partition { |item| item.directory? }
 
     respond_to do |format|
       format.html
-      format.json { render :json => @dropbox_items }
+      format.json { render :json => { :files => @files, :dirs => @dirs }}
     end
   end
 
