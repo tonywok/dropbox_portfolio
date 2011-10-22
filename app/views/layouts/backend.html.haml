@@ -11,14 +11,20 @@
   %body
     %header
     #container
-      #dropbox_dirs
+      %section#explorer
         %h2 Lorem
-      #dropbox_files
-        - unless notice.nil?
-          %p.notice= notice
-        - unless alert.nil?
-          %p.alert= alert
-        = yield
-      %footer
+        #dropbox_dirs
+        %h2 Portfolio
+        #section_dirs
+      %section#remote
+        #dropbox_files
+          - unless notice.nil?
+            %p.notice= notice
+          - unless alert.nil?
+            %p.alert= alert
+          = yield
+      %section#local
+        #files
+    %footer
 
 

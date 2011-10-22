@@ -1,7 +1,7 @@
 @import partials/base
 
-$border_dark   : #333
-$bg_light      : #fff
+$border_dark : #333
+$bg_light    : #fff
 
 html, body
   height: 100%
@@ -9,23 +9,50 @@ html, body
 body
   +blueprint(true)
   background-image: url(<%= asset_path('white_texture_bg.png') %>)
-
-#container
-  +container
+  font-size: 14px
 
 header
   +column(24)
+  background-color: #333
+  height: 3em
+  margin-bottom: 1em
 
 footer
   +column(24)
 
-#dropbox_files
-  +column(19, true)
-  background-color: $bg_light
-  height: 100%
+#container
+  +container
+  height: 90%
 
-#dropbox_dirs
-  +column(5)
-  font-size: 1.5em
-  height: 100%
+  #explorer
+    +column(4)
+    height: 100%
+    background-color: #fff
 
+    #dropbox_dirs
+      font-size: 1.25em
+
+    h2
+      padding-left: .75em
+
+    .directory a
+      display: block
+      padding: .2em 0 .2em 1.5em
+      &:hover
+        background-color: #333
+
+  #remote
+    +column(10)
+    height: 100%
+
+    #dropbox_files
+      background-color: #ccc
+      height: 100%
+
+  #local
+    +column(10, true)
+    height: 100%
+
+    #files
+      height: 100%
+      background-color: #ccc
