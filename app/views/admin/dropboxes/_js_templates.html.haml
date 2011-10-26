@@ -2,7 +2,7 @@
   = link_to(raw('<%= path %>'), raw("#cd<%= path %>"))
 
 %script#file_template{:type => 'text/template'}
-  %img{:src => "https://api.dropbox/0/links<%= path %>"}
+  %img{:src => "https://api.dropbox.com/0/links<%= path %>"}
   %ul
     %li.path "<%= path %>"
     %li.revision "<%= revision %>"
